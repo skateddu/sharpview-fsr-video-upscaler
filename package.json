@@ -1,0 +1,43 @@
+{
+  "name": "sharpview-fsr-video-upscaler",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Real-time upscaling of HTML5 videos in Firefox with FSR1 on WebGL2",
+  "license": "MIT",
+  "author": "Andrea Cadeddu (https://github.com/skateddu)",
+  "homepage": "https://github.com/skateddu/sharpview-fsr-video-upscaler#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skateddu/sharpview-fsr-video-upscaler.git"
+  },
+  "bugs": {
+    "url": "https://github.com/skateddu/sharpview-fsr-video-upscaler/issues"
+  },
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs --serve",
+    "start": "web-ext run --source-dir dist/extension --start-url https://www.youtube.com --pref devtools.console.stdout.content=true --pref devtools.console.stdout.chrome=true",
+    "lint:ext": "web-ext lint --source-dir dist/extension",
+    "package": "node scripts/build.mjs --release && web-ext lint --source-dir dist/extension && web-ext build --source-dir dist/extension --overwrite-dest",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "node --test \"test/unit/*.test.ts\"",
+    "test:render": "node scripts/render-test.mjs",
+    "test:e2e": "node scripts/e2e.mjs",
+    "test": "npm run typecheck && npm run build && npm run test:unit && npm run test:render && npm run test:e2e && npm run test:ui && npm run lint:ext && npm run lint:md",
+    "test:ui": "node scripts/ui-test.mjs",
+    "lint:md": "markdownlint-cli2 \"*.md\" \".github/**/*.md\""
+  },
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^143.0.1",
+    "@types/node": "^26.6.4",
+    "esbuild": "^0.28.2",
+    "markdownlint-cli2": "^0.23.3",
+    "playwright": "^1.64.0",
+    "typescript": "^7.0.2",
+    "web-ext": "^10.7.0"
+  }
+}

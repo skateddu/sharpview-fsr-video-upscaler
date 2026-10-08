@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sharpview · Settings</title>
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    body { font-size: 14px; }
+    main { max-width: 640px; margin: 0 auto; padding: 32px 16px 48px; }
+    header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    header img { width: 36px; height: 36px; }
+    header h1 { font-size: 20px; }
+    section { padding: 18px 0; border-top: 1px solid var(--border); }
+    section > p { margin: 0 0 10px; }
+    .radio { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; }
+    .radio input { margin-top: 3px; }
+    .lists { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+    @media (max-width: 520px) { .lists { grid-template-columns: 1fr; } }
+    .lists label > span { display: block; margin-bottom: 4px; }
+    .lists .inactive { opacity: .55; }
+    textarea { min-height: 120px; resize: vertical; font: 13px ui-monospace, monospace; }
+    .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+    #saved { color: var(--accent); opacity: 0; transition: opacity .2s; }
+    #saved.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <!-- Text in English as a fallback; localized from _locales via data-i18n (see shared/i18n.ts). -->
+  <main>
+    <header>
+      <img src="icons/icon.svg" alt="">
+      <h1 data-i18n="brandName">Sharpview</h1>
+      <span id="saved" aria-live="polite" data-i18n="optionsSaved">Saved</span>
+    </header>
+
+    <section>
+      <h2 data-i18n="optionsSites">Sites</h2>
+      <label class="radio">
+        <input type="radio" name="siteMode" value="all">
+        <span data-i18n="optionsSiteModeAll">Everywhere, except excluded sites</span>
+      </label>
+      <label class="radio">
+        <input type="radio" name="siteMode" value="allowlist">
+        <span data-i18n="optionsSiteModeAllowlist">Only on allowed sites</span>
+      </label>
+      <div class="lists">
+        <label id="blocked-field">
+          <span data-i18n="optionsBlocked">Excluded sites</span>
+          <textarea id="blockedSites" spellcheck="false" placeholder="example.com"></textarea>
+        </label>
+        <label id="allowed-field">
+          <span data-i18n="optionsAllowed">Allowed sites</span>
+          <textarea id="allowedSites" spellcheck="false" placeholder="youtube.com"></textarea>
+        </label>
+      </div>
+      <p class="muted" data-i18n="optionsSitesHelp">One site per line. Subdomains are included: youtube.com also covers
+        m.youtube.com. You can also change them from the popup, with the site switch.</p>
+    </section>
+
+    <section>
+      <h2 data-i18n="optionsActivation">Activation</h2>
+      <label class="field">
+        <div class="field-head"><span data-i18n="optionsMinScale">Minimum magnification to activate upscaling</span></div>
+        <select id="minScale"></select>
+      </label>
+      <p class="muted" data-i18n="optionsMinScaleHelp">Below the threshold the original video is shown, at no GPU cost.</p>
+    </section>
+
+    <section>
+      <h2 data-i18n="optionsShortcuts">Shortcuts</h2>
+      <table class="shortcuts" id="shortcuts"></table>
+      <div class="actions">
+        <button id="edit-shortcuts" hidden data-i18n="optionsEditShortcuts">Edit shortcuts</button>
+        <span class="muted" id="shortcuts-hint" data-i18n="optionsShortcutsHint">To change them: about:addons → gear icon → Manage Extension Shortcuts.</span>
+      </div>
+    </section>
+
+    <section>
+      <h2 data-i18n="optionsReset">Reset</h2>
+      <div class="actions">
+        <button id="reset" data-i18n="optionsResetButton">Restore default settings</button>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

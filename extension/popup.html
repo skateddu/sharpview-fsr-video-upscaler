@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sharpview</title>
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    body { width: 320px; }
+    header, section, footer { padding: 12px 14px; }
+    section + section, header + section, .banner + section { border-top: 1px solid var(--border); }
+    header { display: flex; align-items: center; gap: 10px; }
+    header img { width: 24px; height: 24px; }
+    header h1 { flex: 1; }
+    .banner { margin: 0 14px 12px; }
+    .row { display: flex; align-items: center; gap: 10px; }
+    .row > div { flex: 1; min-width: 0; }
+    #site { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .disabled { opacity: .5; }
+    #videos { list-style: none; margin: 0; padding: 0; }
+    #videos li + li { margin-top: 6px; }
+    .video-main { font-variant-numeric: tabular-nums; }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; background: var(--muted); vertical-align: 1px; }
+    .dot.on { background: var(--accent); }
+    footer { border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+  </style>
+</head>
+<body>
+  <!-- Text in English as a fallback; localized from _locales via data-i18n (see shared/i18n.ts). -->
+  <header>
+    <img src="icons/icon.svg" alt="">
+    <h1 data-i18n="brandName">Sharpview</h1>
+    <label class="switch" title="Alt+Shift+U">
+      <input type="checkbox" id="enabled" aria-label="Turn upscaling on" data-i18n-aria-label="popupMasterSwitch">
+      <span></span>
+    </label>
+  </header>
+
+  <div class="banner" id="permission" hidden>
+    <span data-i18n="popupNeedsAccess">Access to sites is needed to find videos.</span>
+    <div><button class="primary" id="grant" data-i18n="popupGrantAccess">Grant access…</button></div>
+  </div>
+
+  <section class="row" id="site-row">
+    <div>
+      <div data-i18n="popupThisSite">On this site</div>
+      <div class="muted" id="site">—</div>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="site-enabled" aria-label="Enable on this site" data-i18n-aria-label="popupSiteSwitch">
+      <span></span>
+    </label>
+  </section>
+
+  <section id="controls">
+    <label class="field">
+      <div class="field-head"><span data-i18n="popupQuality">Quality</span><kbd>Alt+Shift+G</kbd></div>
+      <select id="quality"></select>
+    </label>
+    <label class="field" id="sharpness-field">
+      <div class="field-head"><span data-i18n="popupSharpness">Sharpness</span><span class="muted" id="sharpness-val"></span></div>
+      <input type="range" id="sharpness" min="0" max="100" step="1">
+    </label>
+    <label class="check" id="denoise-field"><input type="checkbox" id="denoise"> <span data-i18n="popupDenoise">Less sharpening on noise</span></label>
+    <label class="check"><input type="checkbox" id="showInfo"> <span data-i18n="popupShowInfo">Info on the video</span> <kbd>Alt+Shift+I</kbd></label>
+    <label class="check"><input type="checkbox" id="compare"> <span data-i18n="popupCompare">A/B comparison</span> <kbd>Alt+Shift+O</kbd></label>
+  </section>
+
+  <section>
+    <h2 data-i18n="popupVideosInTab">Videos in this tab</h2>
+    <ul id="videos"><li class="muted" data-i18n="popupSearching">Searching…</li></ul>
+  </section>
+
+  <footer>
+    <a href="#" id="options" data-i18n="popupMoreSettings">More settings</a>
+    <span class="muted" id="version"></span>
+  </footer>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

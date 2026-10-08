@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Upscaler Playground</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <aside id="panel">
+    <h1>Upscaler Playground</h1>
+
+    <section>
+      <h2>Source</h2>
+      <label class="button">Open video… <input type="file" id="file" accept="video/*" hidden></label>
+      <button id="pattern">Test pattern</button>
+      <div class="row">
+        <input id="url" type="url" placeholder="Video URL (needs CORS)">
+        <button id="load-url">Load</button>
+      </div>
+      <p class="hint">You can also drop a file on the page.</p>
+    </section>
+
+    <section>
+      <h2>Playback</h2>
+      <div class="row">
+        <button id="play" disabled>▶</button>
+        <input id="seek" type="range" min="0" max="1000" value="0" disabled>
+        <span id="time">0:00</span>
+      </div>
+    </section>
+
+    <section>
+      <h2>Upscaling</h2>
+      <label>Mode
+        <select id="mode"></select>
+      </label>
+      <label>Output resolution
+        <select id="output">
+          <option value="fit">Fit to window</option>
+          <option value="x1">Native (1:1)</option>
+          <option value="x1.5">×1.5</option>
+          <option value="x2">×2</option>
+          <option value="x3">×3</option>
+          <option value="h1080">1080p</option>
+          <option value="h1440">1440p</option>
+          <option value="h2160">2160p</option>
+        </select>
+      </label>
+      <label>RCAS sharpness: <output id="sharpness-val">87%</output>
+        <input id="sharpness" type="range" min="0" max="100" step="1" value="87">
+      </label>
+      <label class="check"><input type="checkbox" id="denoise" checked> Denoise RCAS</label>
+    </section>
+
+    <section>
+      <h2>Comparison</h2>
+      <label>View
+        <select id="view">
+          <option value="canvas">Canvas (upscaler)</option>
+          <option value="native">Browser's native scaling</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="compare"> Split: bilinear on the left</label>
+      <input id="split" type="range" min="0" max="1" step="0.001" value="0.5">
+      <label>Zoom
+        <select id="zoom">
+          <option value="1">100%</option>
+          <option value="2">200%</option>
+          <option value="4">400%</option>
+        </select>
+      </label>
+    </section>
+
+    <section>
+      <h2>Performance</h2>
+      <button id="bench" disabled>Benchmark all modes</button>
+      <pre id="stats"></pre>
+      <pre id="bench-result"></pre>
+    </section>
+
+    <p id="status"></p>
+    <p class="hint">Keys: space play/pause · 1–4 mode · C split · N native view · drag on the video to move the split</p>
+  </aside>
+
+  <main id="stage">
+    <p id="placeholder">Open a video or use the test pattern.</p>
+    <div id="viewport" hidden>
+      <video id="video" loop playsinline></video>
+      <canvas id="canvas"></canvas>
+    </div>
+  </main>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

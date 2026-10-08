@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Type check, test and lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Build
+        run: npm run build
+
+      - name: Lint extension
+        run: npm run lint:ext
+
+      - name: Lint Markdown
+        run: npm run lint:md
+
+      - name: Install Firefox for Playwright
+        run: npx playwright install --with-deps firefox
+
+      - name: UI tests (popup and options)
+        run: npm run test:ui
+
+      # The rendering and end-to-end tests are not run here: the rendering references depend on
+      # the GPU and fonts of the machine that generated them, and the e2e suite needs WebGL2 and
+      # MediaRecorder in a headless Firefox. Both run locally with `npm test`.
+
+      - name: Build release package
+        run: npm run package
+
+      - name: Upload release package
+        uses: actions/upload-artifact@v7
+        with:
+          name: sharpview-fsr-video-upscaler-${{ github.sha }}
+          path: web-ext-artifacts/*.zip
+          retention-days: 30

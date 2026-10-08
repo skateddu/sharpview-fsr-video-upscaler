@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sharpview</title>
+  <link rel="stylesheet" href="ui.css">
+  <style>
+    body { font-size: 16px; line-height: 1.5; }
+    main { max-width: 560px; margin: 64px auto; padding: 0 16px; }
+    h1 { font-size: 24px; margin-bottom: 12px; }
+    h2 { margin-top: 28px; }
+    button { padding: 8px 18px; }
+    .ok { color: var(--accent); font-weight: 600; }
+    .shortcuts { font-size: 14px; }
+  </style>
+</head>
+<body>
+  <!-- Text in English as a fallback; localized from _locales via data-i18n (see shared/i18n.ts). -->
+  <main>
+    <h1 data-i18n="brandName">Sharpview</h1>
+    <p data-i18n="onboardingIntro">This extension makes playing videos sharper with AMD FidelityFX Super Resolution 1, right
+      on your graphics card. To find the videos on web pages it needs access to the sites you visit. It does not
+      collect or send any data.</p>
+    <p><button class="primary" id="grant" data-i18n="onboardingGrant">Grant access to sites</button></p>
+    <p id="status"></p>
+    <h2 data-i18n="optionsShortcuts">Shortcuts</h2>
+    <table class="shortcuts" id="shortcuts"></table>
+    <p class="muted" data-i18n="onboardingDrm">DRM-protected videos (Netflix, Prime Video, Disney+…) cannot be processed.</p>
+  </main>
+  <script src="onboarding.js"></script>
+</body>
+</html>

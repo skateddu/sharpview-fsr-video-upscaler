@@ -1,0 +1,83 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "version": "1.0.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "__MSG_actionTitle__",
+    "default_icon": "icons/icon.svg",
+    "default_popup": "popup.html"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "commands": {
+    "_execute_action": {
+      "description": "__MSG_cmdOpenPopup__"
+    },
+    "toggle": {
+      "suggested_key": {
+        "default": "Alt+Shift+U"
+      },
+      "description": "__MSG_cmdToggle__"
+    },
+    "toggle-quality": {
+      "suggested_key": {
+        "default": "Alt+Shift+G"
+      },
+      "description": "__MSG_cmdToggleQuality__"
+    },
+    "toggle-info": {
+      "suggested_key": {
+        "default": "Alt+Shift+I"
+      },
+      "description": "__MSG_cmdToggleInfo__"
+    },
+    "toggle-compare": {
+      "suggested_key": {
+        "default": "Alt+Shift+O"
+      },
+      "description": "__MSG_cmdToggleCompare__"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "sharpview-fsr-video-upscaler@skateddu",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  }
+}
