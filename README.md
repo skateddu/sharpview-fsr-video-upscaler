@@ -1,5 +1,6 @@
 # Sharpview – FSR Video Upscaler
 
+[![Firefox Add-on](https://img.shields.io/amo/v/sharpview-fsr-video-upscaler?logo=firefoxbrowser&logoColor=white&label=firefox%20add-on)](https://addons.mozilla.org/firefox/addon/sharpview-fsr-video-upscaler/)
 [![CI](https://github.com/skateddu/sharpview-fsr-video-upscaler/actions/workflows/ci.yml/badge.svg)](https://github.com/skateddu/sharpview-fsr-video-upscaler/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/skateddu/sharpview-fsr-video-upscaler)](LICENSE.md)
 [![Firefox >= 140](https://img.shields.io/badge/firefox-%3E%3D140-FF7139?logo=firefoxbrowser&logoColor=white)](https://www.mozilla.org/firefox/)
@@ -30,8 +31,11 @@ recent NVIDIA, AMD and Intel ones.
 
 ## Installation
 
-The extension is not on [addons.mozilla.org](https://addons.mozilla.org/) yet. To try it from
-source (requires Node.js 22.18+ and Firefox 140+):
+Install it from **[Firefox Add-ons](https://addons.mozilla.org/firefox/addon/sharpview-fsr-video-upscaler/)**
+(Firefox 140 or later). On first install a page asks for access to sites: the extension needs it
+to find the videos on web pages.
+
+To try it from source instead (requires Node.js 22.18+):
 
 ```bash
 git clone https://github.com/skateddu/sharpview-fsr-video-upscaler.git
@@ -41,11 +45,9 @@ npm run build
 npm start          # opens Firefox with the extension loaded
 ```
 
-Alternatively, `npm run package` builds a zip in `web-ext-artifacts/` that can be loaded from
-`about:debugging` → This Firefox → Load Temporary Add-on.
-
-On first install a page asks for access to sites: the extension needs it to find the videos on
-web pages.
+Each [GitHub release](https://github.com/skateddu/sharpview-fsr-video-upscaler/releases) also
+has the unsigned package as a zip, which can be loaded from `about:debugging` → This Firefox →
+Load Temporary Add-on (`npm run package` builds the same zip in `web-ext-artifacts/`).
 
 ## Usage
 
@@ -116,7 +118,7 @@ result on video. Firefox's native RTX Video Super Resolution only works on NVIDI
 
 ```text
 sharpview-fsr-video-upscaler/
-├── .github/                  # CI workflow, issue and pull request templates
+├── .github/                  # CI and release workflows, issue and pull request templates
 ├── extension/                # Manifest, icon, static HTML, CSS
 │   └── _locales/             # en (reference) and it message catalogs
 ├── playground/               # Standalone page to compare modes and measure cost
@@ -175,14 +177,6 @@ mode.
 
 Playwright cannot load extensions in Firefox, so the toolbar, permissions and real sites are
 checked by hand with `npm start`.
-
-## Roadmap
-
-- Measurements on integrated and entry-level GPUs at 1080p→4K (they decide whether Bilinear +
-  RCAS stays a user choice or only the automatic fallback)
-- More real-site checks: video embeds in articles, Reddit, feeds with many videos, page zoom
-- Publication on addons.mozilla.org
-- Later: a WebGPU backend with zero-copy video import, a Chrome port
 
 ## Contributing
 
