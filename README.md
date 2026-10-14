@@ -23,9 +23,12 @@ recent NVIDIA, AMD and Intel ones.
   lighter quality)
 - **Frame-accurate**: renders every video frame, also at 60 fps, and pauses for videos that are
   off screen or paused
+- **Sharpening at native size** (optional): videos that are not enlarged get RCAS sharpening
+  only, e.g. a 1080p video on a 1080p screen
 - **Per-site control**: run everywhere except excluded sites, or only on allowed sites
 - **A/B comparison**: plain bilinear on the left, upscaler on the right, to judge the result
-- **Info label**: input and output resolution, scale and fps on the video, or why it stays native
+- **Info label**: input and output resolution, scale, fps and GPU time per frame on the video, or
+  why it stays native
 - **Private**: no network requests, no data collection; settings sync with your Firefox account
 - **Localized**: English, Italian, French, German and Spanish
 
@@ -55,7 +58,7 @@ Upscaling starts automatically on every video shown larger than its resolution, 
 720p video in theater mode or fullscreen. Clicking the toolbar icon opens the popup: master and
 per-site switches, quality, sharpness, A/B comparison and the state of the tab's videos. The
 badge shows **ON** when active and **OFF** on excluded sites. The options page sets excluded or
-allowed sites and the activation threshold.
+allowed sites, the activation threshold and sharpening for videos that are not enlarged.
 
 | Shortcut | Action |
 | --- | --- |

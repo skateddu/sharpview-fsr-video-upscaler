@@ -25,6 +25,8 @@ export interface Settings {
   compare: boolean;
   /** Minimum scale factor to activate upscaling. */
   minScale: number;
+  /** Below the threshold, sharpening only (RCAS) instead of the original video. */
+  sharpenNative: boolean;
   siteMode: SiteMode;
   blockedSites: string[];
   allowedSites: string[];
@@ -39,6 +41,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showInfo: false,
   compare: false,
   minScale: 1.05,
+  sharpenNative: false,
   siteMode: 'all',
   blockedSites: [],
   allowedSites: [],
@@ -105,6 +108,7 @@ export function normalizeSettings(raw: unknown): Settings {
     showInfo: bool('showInfo'),
     compare: bool('compare'),
     minScale: num('minScale', 1, 4),
+    sharpenNative: bool('sharpenNative'),
     siteMode: r.siteMode === 'allowlist' ? 'allowlist' : 'all',
     blockedSites: normalizeHostList(r.blockedSites),
     allowedSites: normalizeHostList(r.allowedSites),

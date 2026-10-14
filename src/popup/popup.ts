@@ -102,13 +102,13 @@ function describe(v: VideoStatus): HTMLLIElement {
   main.className = 'video-main';
   const dot = document.createElement('span');
   dot.className = v.active ? 'dot on' : 'dot';
-  main.append(dot, v.active ? `${v.input} → ${v.output} · ${v.fps} fps` : `${v.input} · ${t('popupNative')}`);
+  main.append(dot, v.active ? `${v.input} → ${v.output} · ${v.fps} fps · ${v.costMs.toFixed(1)} ms` : `${v.input} · ${t('popupNative')}`);
   const detail = document.createElement('div');
   detail.className = 'muted';
   detail.textContent = v.active
     ? [
-        t(QUALITY_KEYS[v.quality].label),
-        v.degraded ? t('popupReduced') : '',
+        v.sharpenOnly ? t('popupSharpenOnly') : t(QUALITY_KEYS[v.quality].label),
+        v.degraded && !v.sharpenOnly ? t('popupReduced') : '',
         settings.compare ? t('popupCompare') : '',
       ]
         .filter(Boolean)

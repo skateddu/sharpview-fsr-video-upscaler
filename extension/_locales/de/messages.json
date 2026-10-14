@@ -36,6 +36,7 @@
   "popupNoVideos": { "message": "Keine Videos gefunden" },
   "popupNative": { "message": "nativ" },
   "popupReduced": { "message": "reduziert: langsame GPU" },
+  "popupSharpenOnly": { "message": "Nur Schärfung (RCAS)" },
 
   "labelNative": {
     "message": "nativ · $REASON$",
@@ -43,6 +44,7 @@
   },
   "labelReduced": { "message": "(reduziert)" },
   "labelNoSharpening": { "message": "ohne Schärfung" },
+  "labelSharpenOnly": { "message": "nur Schärfung" },
 
   "statusActive": { "message": "Aktiv" },
   "statusWaiting": { "message": "Wartet" },
@@ -80,6 +82,8 @@
   "optionsMinScale125": { "message": "×1.25" },
   "optionsMinScale150": { "message": "×1.5: spart GPU-Leistung und Akku" },
   "optionsMinScale200": { "message": "×2: nur Videos, die viel kleiner als der Bildschirm sind" },
+  "optionsSharpenNative": { "message": "Auch nicht vergrößerte Videos schärfen" },
+  "optionsSharpenNativeHelp": { "message": "Unterhalb der Schwelle erhalten Videos, die in ihrer Auflösung oder größer angezeigt werden, nur die Schärfung (RCAS) statt des Originalvideos, mit der im Popup gewählten Schärfe. Kleiner als ihre Auflösung angezeigte Videos bleiben nativ." },
   "optionsShortcuts": { "message": "Tastenkombinationen" },
   "optionsEditShortcuts": { "message": "Tastenkombinationen bearbeiten" },
   "optionsShortcutsHint": { "message": "Zum Ändern: about:addons → Zahnrad-Symbol → Tastenkombinationen für Erweiterungen verwalten." },

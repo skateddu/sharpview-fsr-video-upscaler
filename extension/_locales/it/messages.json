@@ -36,6 +36,7 @@
   "popupNoVideos": { "message": "Nessun video rilevato" },
   "popupNative": { "message": "nativo" },
   "popupReduced": { "message": "ridotta: GPU lenta" },
+  "popupSharpenOnly": { "message": "Solo nitidezza (RCAS)" },
 
   "labelNative": {
     "message": "nativo · $REASON$",
@@ -43,6 +44,7 @@
   },
   "labelReduced": { "message": "(ridotta)" },
   "labelNoSharpening": { "message": "senza nitidezza" },
+  "labelSharpenOnly": { "message": "solo nitidezza" },
 
   "statusActive": { "message": "Attivo" },
   "statusWaiting": { "message": "In attesa" },
@@ -80,6 +82,8 @@
   "optionsMinScale125": { "message": "×1.25" },
   "optionsMinScale150": { "message": "×1.5: risparmia GPU e batteria" },
   "optionsMinScale200": { "message": "×2: solo video molto più piccoli dello schermo" },
+  "optionsSharpenNative": { "message": "Rendi più nitidi anche i video non ingranditi" },
+  "optionsSharpenNativeHelp": { "message": "Sotto la soglia, i video mostrati alla loro risoluzione o più grandi ricevono solo la nitidezza (RCAS) invece del video originale, con la nitidezza scelta nel popup. I video mostrati più piccoli della loro risoluzione restano nativi." },
   "optionsShortcuts": { "message": "Scorciatoie" },
   "optionsEditShortcuts": { "message": "Modifica scorciatoie" },
   "optionsShortcutsHint": { "message": "Per cambiarle: about:addons → ingranaggio → Gestisci scorciatoie estensioni." },

@@ -36,6 +36,7 @@
   "popupNoVideos": { "message": "No videos found" },
   "popupNative": { "message": "native" },
   "popupReduced": { "message": "reduced: slow GPU" },
+  "popupSharpenOnly": { "message": "Sharpening only (RCAS)" },
 
   "labelNative": {
     "message": "native · $REASON$",
@@ -43,6 +44,7 @@
   },
   "labelReduced": { "message": "(reduced)" },
   "labelNoSharpening": { "message": "no sharpening" },
+  "labelSharpenOnly": { "message": "sharpening only" },
 
   "statusActive": { "message": "Active" },
   "statusWaiting": { "message": "Waiting" },
@@ -80,6 +82,8 @@
   "optionsMinScale125": { "message": "×1.25" },
   "optionsMinScale150": { "message": "×1.5: saves GPU and battery" },
   "optionsMinScale200": { "message": "×2: only videos much smaller than the screen" },
+  "optionsSharpenNative": { "message": "Sharpen videos that are not enlarged" },
+  "optionsSharpenNativeHelp": { "message": "Below the threshold, videos shown at their resolution or larger get sharpening only (RCAS) instead of the original video, with the sharpness set in the popup. Videos shown smaller than their resolution stay native." },
   "optionsShortcuts": { "message": "Shortcuts" },
   "optionsEditShortcuts": { "message": "Edit shortcuts" },
   "optionsShortcutsHint": { "message": "To change them: about:addons → gear icon → Manage Extension Shortcuts." },

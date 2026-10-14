@@ -18,6 +18,7 @@ const radios = [...document.querySelectorAll<HTMLInputElement>('input[name=siteM
 const blocked = $<HTMLTextAreaElement>('blockedSites');
 const allowed = $<HTMLTextAreaElement>('allowedSites');
 const minScale = $<HTMLSelectElement>('minScale');
+const sharpenNative = $<HTMLInputElement>('sharpenNative');
 const saved = $<HTMLElement>('saved');
 
 localizePage();
@@ -38,6 +39,7 @@ function render(): void {
   const value = String(settings.minScale);
   if (![...minScale.options].some((opt) => opt.value === value)) minScale.add(new Option(`×${value}`, value));
   minScale.value = value;
+  sharpenNative.checked = settings.sharpenNative;
 }
 
 async function save(patch: Partial<Settings>): Promise<void> {
@@ -60,6 +62,7 @@ for (const r of radios) r.addEventListener('change', () => save({ siteMode: r.va
 blocked.addEventListener('change', () => save({ blockedSites: parseList(blocked.value) }));
 allowed.addEventListener('change', () => save({ allowedSites: parseList(allowed.value) }));
 minScale.addEventListener('change', () => save({ minScale: Number(minScale.value) }));
+sharpenNative.addEventListener('change', () => save({ sharpenNative: sharpenNative.checked }));
 $('reset').addEventListener('click', () => {
   if (confirm(t('optionsResetConfirm'))) save({ ...DEFAULT_SETTINGS });
 });

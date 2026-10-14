@@ -152,6 +152,22 @@ await page.waitForTimeout(300);
 state = await debug();
 expect('threshold ×1.05 → active again', state.contain.active, why(state.contain));
 
+// Sharpening only: "small" is shown at ×1.00, below the threshold.
+await page.evaluate(() => window.__videoUpscaler.set({ sharpenNative: true }));
+await page.waitForTimeout(300);
+state = await debug();
+expect('sharpen native: ×1 video active with sharpening only', state.small.active && state.small.sharpenOnly, why(state.small));
+expect('sharpen native: enlarged video still upscaled', state.contain.active && !state.contain.sharpenOnly, why(state.contain));
+expect('frame cost measured', state.small.costMs > 0 && state.contain.costMs > 0, `${state.small.costMs} / ${state.contain.costMs} ms`);
+await page.evaluate(() => window.__videoUpscaler.set({ sharpness: 0 }));
+await page.waitForTimeout(300);
+state = await debug();
+expect('sharpen native without sharpness → native', !state.small.active && state.small.code === 'not-needed', why(state.small));
+await page.evaluate(() => window.__videoUpscaler.set({ sharpenNative: false, sharpness: 87 }));
+await page.waitForTimeout(300);
+state = await debug();
+expect('sharpen native off → native again', !state.small.active && state.small.code === 'not-needed', why(state.small));
+
 // Layout moved while the video is paused (no resize): realigned by the periodic check.
 await page.evaluate(() => {
   document.getElementById('contain').pause();

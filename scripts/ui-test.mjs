@@ -34,7 +34,7 @@ function stub({ granted, stored, legacy, catalog, lang, formatSource }) {
   const sync = stored ?? {};
   const local = legacy ?? {};
   const listeners = [];
-  const video = (o) => ({ id: '', session: 1, relevant: true, quality: 'high', degraded: false, frames: 100, canvasRect: null, ...o });
+  const video = (o) => ({ id: '', session: 1, relevant: true, quality: 'high', sharpenOnly: false, degraded: false, costMs: 0, frames: 100, canvasRect: null, ...o });
   window.__stub = { sync, local, opened: [] };
   window.browser = {
     storage: { sync: area(sync), local: area(local), onChanged: { addListener: (l) => listeners.push(l) } },
@@ -48,7 +48,8 @@ function stub({ granted, stored, legacy, catalog, lang, formatSource }) {
       sendMessage: async () => ({
         frame: 'www.youtube.com',
         videos: [
-          video({ active: true, code: 'active', input: '854×480', output: '2560×1440', fps: 60, videoFps: 60 }),
+          video({ active: true, code: 'active', input: '854×480', output: '2560×1440', fps: 60, videoFps: 60, costMs: 1.8 }),
+          video({ active: true, code: 'active', sharpenOnly: true, input: '1920×1080', output: '1920×1080', fps: 30, videoFps: 30, costMs: 0.6 }),
           video({ active: false, code: 'not-needed', detail: '0.62', input: '1280×720', output: '0×0', fps: 0, videoFps: 30 }),
         ],
       }),
@@ -101,8 +102,9 @@ for (const scheme of ['light', 'dark']) {
   const { page, context, errors } = await open('popup.html');
   await page.waitForSelector('#videos .dot');
   expect('popup: tab site', (await page.textContent('#site')).startsWith('youtube.com'));
-  expect('popup: video states', (await page.locator('#videos li').count()) === 2);
-  expect('popup: active video described', (await page.textContent('#videos')).includes('854×480 → 2560×1440 · 60 fps'));
+  expect('popup: video states', (await page.locator('#videos li').count()) === 3);
+  expect('popup: active video described', (await page.textContent('#videos')).includes('854×480 → 2560×1440 · 60 fps · 1.8 ms'));
+  expect('popup: sharpening only described', (await page.textContent('#videos')).includes('Sharpening only (RCAS)'));
   expect('popup: native video explained', (await page.textContent('#videos')).includes('(×0.62)'));
 
   await page.click('#site-enabled');
@@ -203,11 +205,15 @@ for (const scheme of ['light', 'dark']) {
   await page.selectOption('#minScale', '1.5');
   expect('options: threshold saved', (await settingsOf(page)).minScale === 1.5);
 
+  await page.check('#sharpenNative');
+  expect('options: sharpen native saved', (await settingsOf(page)).sharpenNative === true);
+
   page.once('dialog', (d) => d.accept());
   await page.click('#reset');
   await page.waitForTimeout(200);
   s = await settingsOf(page);
-  expect('options: reset', s.siteMode === 'all' && s.blockedSites.length === 0 && s.minScale === 1.05);
+  expect('options: reset', s.siteMode === 'all' && s.blockedSites.length === 0 && s.minScale === 1.05 && !s.sharpenNative);
+  expect('options: reset unchecks sharpen native', !(await page.isChecked('#sharpenNative')));
   expect('options: no errors', errors.length === 0, errors.join(' | '));
   await context.close();
 }

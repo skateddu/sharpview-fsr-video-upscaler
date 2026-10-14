@@ -6,6 +6,12 @@ import type { Status } from '../shared/status.ts';
 /** Videos smaller than this (CSS px) are previews, ads or trackers: ignored. */
 export const MIN_BOX = 128;
 
+/**
+ * Lowest scale for sharpening only: a video shown at its resolution, allowing for rounding.
+ * Smaller videos stay native, as bilinear without mipmaps would downscale worse than Firefox.
+ */
+export const MIN_SHARPEN_SCALE = 0.98;
+
 export interface LayoutInput {
   videoWidth: number;
   videoHeight: number;
@@ -20,6 +26,8 @@ export interface LayoutInput {
   objectPosition: string;
   devicePixelRatio: number;
   minScale: number;
+  /** Below minScale, sharpening only instead of the original video (and sharpness > 0). */
+  sharpenNative: boolean;
 }
 
 export interface Layout {
@@ -29,6 +37,8 @@ export interface Layout {
   clip: [number, number, number, number];
   /** Magnification in physical pixels relative to the source. */
   scale: number;
+  /** Below the threshold: sharpening only, without upscaling. */
+  sharpenOnly: boolean;
   /** Output resolution in physical pixels (before GPU limits). */
   outWidth: number;
   outHeight: number;
@@ -45,7 +55,8 @@ export function evaluateLayout(i: LayoutInput): LayoutResult {
   const content = contentRect(i.objectFit, i.videoWidth, i.videoHeight, i.boxWidth, i.boxHeight, i.objectPosition);
   const dpr = i.devicePixelRatio;
   const scale = Math.min((content.width * dpr) / i.videoWidth, (content.height * dpr) / i.videoHeight);
-  if (scale < i.minScale) return no('not-needed', scale.toFixed(2));
+  const sharpenOnly = scale < i.minScale;
+  if (sharpenOnly && !(i.sharpenNative && scale >= MIN_SHARPEN_SCALE)) return no('not-needed', scale.toFixed(2));
 
   return {
     ok: true,
@@ -53,6 +64,7 @@ export function evaluateLayout(i: LayoutInput): LayoutResult {
       content,
       clip: clipInsets(content, i.boxWidth, i.boxHeight),
       scale,
+      sharpenOnly,
       outWidth: Math.round(content.width * dpr),
       outHeight: Math.round(content.height * dpr),
     },

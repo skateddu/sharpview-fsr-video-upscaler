@@ -36,6 +36,7 @@
   "popupNoVideos": { "message": "Aucune vidéo trouvée" },
   "popupNative": { "message": "native" },
   "popupReduced": { "message": "réduite : GPU lent" },
+  "popupSharpenOnly": { "message": "Netteté seule (RCAS)" },
 
   "labelNative": {
     "message": "native · $REASON$",
@@ -43,6 +44,7 @@
   },
   "labelReduced": { "message": "(réduite)" },
   "labelNoSharpening": { "message": "sans netteté" },
+  "labelSharpenOnly": { "message": "netteté seule" },
 
   "statusActive": { "message": "Active" },
   "statusWaiting": { "message": "En attente" },
@@ -80,6 +82,8 @@
   "optionsMinScale125": { "message": "×1.25" },
   "optionsMinScale150": { "message": "×1.5 : économise le GPU et la batterie" },
   "optionsMinScale200": { "message": "×2 : uniquement les vidéos bien plus petites que l’écran" },
+  "optionsSharpenNative": { "message": "Accentuer aussi les vidéos non agrandies" },
+  "optionsSharpenNativeHelp": { "message": "En dessous du seuil, les vidéos affichées à leur résolution ou plus grandes reçoivent seulement la netteté (RCAS) au lieu de la vidéo d’origine, avec la netteté choisie dans le panneau. Les vidéos affichées plus petites que leur résolution restent natives." },
   "optionsShortcuts": { "message": "Raccourcis" },
   "optionsEditShortcuts": { "message": "Modifier les raccourcis" },
   "optionsShortcutsHint": { "message": "Pour les modifier : about:addons → icône d’engrenage → Gérer les raccourcis d’extensions." },

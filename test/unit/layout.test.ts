@@ -14,6 +14,7 @@ const base: LayoutInput = {
   objectPosition: '50% 50%',
   devicePixelRatio: 2,
   minScale: 1.05,
+  sharpenNative: false,
 };
 
 test('eligible layout: content, clipping, scale and output', () => {
@@ -22,6 +23,7 @@ test('eligible layout: content, clipping, scale and output', () => {
   assert.deepEqual(r.layout.content, { x: 0, y: 90, width: 960, height: 540 });
   assert.deepEqual(r.layout.clip, [0, 0, 0, 0]);
   assert.equal(r.layout.scale, 3);
+  assert.equal(r.layout.sharpenOnly, false);
   assert.deepEqual([r.layout.outWidth, r.layout.outHeight], [1920, 1080]);
 });
 
@@ -56,6 +58,23 @@ test('not-needed reports the scale with two decimals', () => {
 test('the activation threshold is inclusive', () => {
   assert.ok(evaluateLayout({ ...base, minScale: 3 }).ok);
   assert.ok(!evaluateLayout({ ...base, minScale: 3.01 }).ok);
+});
+
+test('below the threshold: sharpening only, when enabled, for videos at least at their resolution', () => {
+  // 640×360 shown at 640×360 physical pixels: ×1.00.
+  const native = { ...base, devicePixelRatio: 1, boxWidth: 640, boxHeight: 360, sharpenNative: true };
+  const r = evaluateLayout(native);
+  assert.ok(r.ok);
+  assert.equal(r.layout.sharpenOnly, true);
+  assert.deepEqual([r.layout.outWidth, r.layout.outHeight], [640, 360]);
+  // Rounding just below ×1 is still sharpened; a downscaled video stays native.
+  assert.ok(evaluateLayout({ ...native, boxWidth: 630, boxHeight: 354 }).ok);
+  const smaller = evaluateLayout({ ...native, boxWidth: 480, boxHeight: 270 });
+  assert.ok(!smaller.ok);
+  assert.deepEqual(smaller.status, { code: 'not-needed', detail: '0.75' });
+  // Above the threshold it is regular upscaling.
+  const up = evaluateLayout({ ...base, sharpenNative: true });
+  assert.ok(up.ok && !up.layout.sharpenOnly);
 });
 
 test('isTranslationOnly', () => {

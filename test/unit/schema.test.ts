@@ -101,6 +101,13 @@ test('normalizeSettings: v2 is not migrated again', () => {
   assert.deepEqual(normalizeSettings(v2), v2);
 });
 
+test('normalizeSettings: sharpenNative is off when missing (saved by 1.0.0)', () => {
+  const { sharpenNative, ...saved } = { ...DEFAULT_SETTINGS, sharpenNative: true };
+  assert.equal(normalizeSettings(saved).sharpenNative, false);
+  assert.equal(normalizeSettings({ ...saved, sharpenNative }).sharpenNative, true);
+  assert.equal(normalizeSettings({ ...saved, sharpenNative: 'yes' }).sharpenNative, false);
+});
+
 test('normalizeSettings: corrupted values → defaults or limits', () => {
   const s = normalizeSettings({
     version: 2,

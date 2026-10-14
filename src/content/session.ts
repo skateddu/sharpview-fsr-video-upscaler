@@ -49,6 +49,10 @@ export class VideoSession {
   private gpuSlow = false;
   /** Rendering options for the settings and the effective quality. */
   private options: RenderOptions;
+  /** Rendering options below the activation threshold: bilinear at ~1:1, then RCAS. */
+  private sharpenOptions: RenderOptions;
+  /** The last frame was drawn below the threshold, with sharpening only. */
+  private sharpenOnly = false;
   private frames = 0;
   /** Measure the cost of the next frame (once per FpsMeter window). */
   private measureNext = true;
@@ -61,6 +65,7 @@ export class VideoSession {
     private readonly budget: GpuBudget,
   ) {
     this.options = toRenderOptions(settings);
+    this.sharpenOptions = toRenderOptions(settings, 'light');
     this.loop = new FrameLoop(video, this.onVideoFrame);
     this.resizeObserver = new ResizeObserver(this.update);
     this.resizeObserver.observe(video);
@@ -86,6 +91,7 @@ export class VideoSession {
     this.settings = settings;
     if (qualityChanged) this.resetDegrade();
     this.options = toRenderOptions(settings, this.effectiveQuality());
+    this.sharpenOptions = toRenderOptions(settings, 'light');
     this.update();
   }
 
@@ -126,9 +132,11 @@ export class VideoSession {
       relevant: this.isRelevant(),
       active: shown,
       quality: this.effectiveQuality(),
+      sharpenOnly: shown && this.sharpenOnly,
       degraded: this.degraded || this.gpuSlow,
       fps: shown ? Math.round(this.meter.fps) : 0,
       videoFps: Math.round(this.meter.videoFps),
+      costMs: shown ? Math.round(this.frameCost * 10) / 10 : 0,
       input: `${v.videoWidth}×${v.videoHeight}`,
       output: `${this.overlay.canvas.width}×${this.overlay.canvas.height}`,
       canvasRect: r && { x: r.x, y: r.y, width: r.width, height: r.height },
@@ -146,10 +154,13 @@ export class VideoSession {
     return this.degraded ? 'light' : this.settings.quality;
   }
 
-  /** Ladder: high → light → native video (GPU released). Takes effect from the next frame. */
+  /**
+   * Ladder: high → light → native video (GPU released). Takes effect from the next frame.
+   * Sharpening only already uses the light pipeline: straight to the native video.
+   */
   private stepDown(): void {
     this.governor.reset();
-    if (!this.degraded && this.settings.quality === 'high') {
+    if (!this.degraded && this.settings.quality === 'high' && !this.sharpenOnly) {
       this.degraded = true;
       this.options = toRenderOptions(this.settings, 'light');
     } else {
@@ -221,6 +232,7 @@ export class VideoSession {
       objectPosition: style.objectPosition,
       devicePixelRatio,
       minScale: this.settings.minScale,
+      sharpenNative: this.settings.sharpenNative && this.settings.sharpness > 0,
     });
     if (!result.ok) return result.status;
 
@@ -229,6 +241,7 @@ export class VideoSession {
 
     const fixed = style.position === 'fixed';
     const corner = this.overlay.show(v, result.layout, videoOrigin(v, fixed), fixed, style.zIndex === 'auto' ? '' : style.zIndex);
+    this.sharpenOnly = result.layout.sharpenOnly;
     const error = this.draw(upscaler, result.layout);
     if (error) return error;
 
@@ -266,7 +279,7 @@ export class VideoSession {
     }
     try {
       const t0 = performance.now();
-      upscaler.render(v, v.videoWidth, v.videoHeight, this.options);
+      upscaler.render(v, v.videoWidth, v.videoHeight, layout.sharpenOnly ? this.sharpenOptions : this.options);
       if (this.measureNext) {
         // Synchronous wait on the GPU once per window: the real cost of our work.
         upscaler.finish();
@@ -299,14 +312,15 @@ export class VideoSession {
     const v = this.video;
     const s = this.settings;
     const flags = [
-      t(QUALITY_KEYS[this.effectiveQuality()].short),
-      this.degraded ? t('labelReduced') : '',
+      layout.sharpenOnly ? t('labelSharpenOnly') : t(QUALITY_KEYS[this.effectiveQuality()].short),
+      this.degraded && !layout.sharpenOnly ? t('labelReduced') : '',
       s.sharpness ? '' : t('labelNoSharpening'),
       s.compare ? 'A/B' : '',
     ].filter(Boolean);
     return (
       `${flags.join(' ')} · ${v.videoWidth}×${v.videoHeight} → ${this.overlay.canvas.width}×${this.overlay.canvas.height} · ` +
-      `×${layout.scale.toFixed(2)} · ${this.meter.fps.toFixed(0)}/${this.meter.videoFps.toFixed(0)} fps`
+      `×${layout.scale.toFixed(2)} · ${this.meter.fps.toFixed(0)}/${this.meter.videoFps.toFixed(0)} fps · ` +
+      `${this.frameCost.toFixed(1)} ms`
     );
   }
 

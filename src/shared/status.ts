@@ -56,9 +56,13 @@ export interface VideoStatus extends Status {
   active: boolean;
   /** Effective quality (lighter than the chosen one when the GPU cannot keep up). */
   quality: Quality;
+  /** Below the activation threshold: sharpening only. */
+  sharpenOnly: boolean;
   degraded: boolean;
   fps: number;
   videoFps: number;
+  /** Last measured cost of a frame (upload + passes until the GPU completes them), in ms. */
+  costMs: number;
   input: string;
   output: string;
   canvasRect: { x: number; y: number; width: number; height: number } | null;

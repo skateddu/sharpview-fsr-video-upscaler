@@ -36,6 +36,7 @@
   "popupNoVideos": { "message": "No se han encontrado vídeos" },
   "popupNative": { "message": "nativo" },
   "popupReduced": { "message": "reducida: GPU lenta" },
+  "popupSharpenOnly": { "message": "Solo nitidez (RCAS)" },
 
   "labelNative": {
     "message": "nativo · $REASON$",
@@ -43,6 +44,7 @@
   },
   "labelReduced": { "message": "(reducida)" },
   "labelNoSharpening": { "message": "sin nitidez" },
+  "labelSharpenOnly": { "message": "solo nitidez" },
 
   "statusActive": { "message": "Activo" },
   "statusWaiting": { "message": "En espera" },
@@ -80,6 +82,8 @@
   "optionsMinScale125": { "message": "×1.25" },
   "optionsMinScale150": { "message": "×1.5: ahorra GPU y batería" },
   "optionsMinScale200": { "message": "×2: solo vídeos mucho más pequeños que la pantalla" },
+  "optionsSharpenNative": { "message": "Dar nitidez también a los vídeos no ampliados" },
+  "optionsSharpenNativeHelp": { "message": "Por debajo del umbral, los vídeos mostrados a su resolución o mayores reciben solo nitidez (RCAS) en lugar del vídeo original, con la nitidez elegida en el panel. Los vídeos mostrados más pequeños que su resolución se quedan nativos." },
   "optionsShortcuts": { "message": "Atajos de teclado" },
   "optionsEditShortcuts": { "message": "Editar atajos" },
   "optionsShortcutsHint": { "message": "Para cambiarlos: about:addons → icono de engranaje → Administrar atajos de extensiones." },
