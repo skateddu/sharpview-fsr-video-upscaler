@@ -1,6 +1,8 @@
-// Builds the extension, the playground and the test harness.
-//   --serve    watch + playground server
-//   --release  package to publish: no diagnostic logs, no sourcemaps
+/*
+ * Builds the extension, the playground and the test harness.
+ *   --serve    watch + playground server
+ *   --release  package to publish: no diagnostic logs, no sourcemaps
+ */
 import * as esbuild from 'esbuild';
 import { cp, mkdir, rm } from 'node:fs/promises';
 

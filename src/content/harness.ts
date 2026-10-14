@@ -1,5 +1,4 @@
-// Test entry: the same logic as the content script, without extension APIs. scripts/e2e.mjs
-// injects it into the fixture pages and drives it through window.__videoUpscaler.
+// Test entry: the content script logic without extension APIs, driven by scripts/e2e.mjs.
 import { Controller } from './controller';
 import { DEFAULT_SETTINGS, normalizeSettings, type Settings } from '../shared/schema';
 

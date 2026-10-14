@@ -169,7 +169,7 @@ mode.
 
 ### Tests
 
-- **Unit** (`node --test`): geometry, layout, settings schema and migration, settings queue,
+- **Unit** (`node --test`): geometry, layout, settings schema, settings queue,
   status messages, performance logic, translation catalogs.
 - **Rendering**: every mode compared pixel by pixel with `test/golden`, also after a WebGL
   context loss.

@@ -68,37 +68,9 @@ test('setSiteEnabled in "allowed sites only" mode', () => {
   assert.deepEqual(s.blockedSites, []);
 });
 
-test('normalizeSettings: migration from v0 (no version)', () => {
-  const v0 = { enabled: false, mode: 'fsr', sharpness: 0.2, denoise: false, showInfo: true };
-  assert.deepEqual(normalizeSettings(v0), {
-    ...DEFAULT_SETTINGS,
-    enabled: false,
-    quality: 'high',
-    sharpness: 87,
-    denoise: false,
-    showInfo: true,
-  });
-});
-
-test('normalizeSettings: migration from v1 (algorithms → quality, stops → %)', () => {
-  const v1 = (mode: string, sharpness: number) => normalizeSettings({ ...DEFAULT_SETTINGS, version: 1, mode, sharpness });
-  // FSR1 with AMD's default
-  assert.deepEqual([v1('fsr', 0.2).quality, v1('fsr', 0.2).sharpness], ['high', 87]);
-  // v1's maximum and minimum sharpening
-  assert.equal(v1('fsr', 0).sharpness, 100);
-  assert.equal(v1('fsr', 2).sharpness, 25);
-  // EASU only = high quality without sharpening
-  assert.deepEqual([v1('easu', 0.2).quality, v1('easu', 0.2).sharpness], ['high', 0]);
-  assert.equal(v1('bilinear-rcas', 0.2).quality, 'light');
-  // Bilinear (= the browser alone) → high: whoever had the extension on wanted it active
-  assert.equal(v1('bilinear', 0.2).quality, 'high');
-  assert.equal(v1('fsr', 0.2).version, 2);
-  assert.ok(!('mode' in v1('fsr', 0.2)));
-});
-
-test('normalizeSettings: v2 is not migrated again', () => {
-  const v2 = { ...DEFAULT_SETTINGS, quality: 'light', sharpness: 2 };
-  assert.deepEqual(normalizeSettings(v2), v2);
+test('normalizeSettings: valid settings are kept as they are', () => {
+  const saved = { ...DEFAULT_SETTINGS, quality: 'light', sharpness: 2 };
+  assert.deepEqual(normalizeSettings(saved), saved);
 });
 
 test('normalizeSettings: sharpenNative is off when missing (saved by 1.0.0)', () => {

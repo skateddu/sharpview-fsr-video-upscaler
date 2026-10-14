@@ -1,5 +1,4 @@
-// Background (event page): shortcuts, per-tab badge, the tab's site for content scripts and
-// permission onboarding. Clicking the toolbar icon opens the popup.
+// Background: shortcuts, per-tab badge, the tab's site for content scripts, onboarding.
 import { QUALITIES } from '../core/modes';
 import { isSiteEnabled, loadSettings, normalizeHost, onSettingsChanged, updateSettings, type Settings } from '../shared/settings';
 import { hasSiteAccess, openOnboarding } from '../shared/permissions';

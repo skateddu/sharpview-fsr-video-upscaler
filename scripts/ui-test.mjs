@@ -1,8 +1,8 @@
-// Popup and options tests: the built pages run in Firefox (Playwright) with a fake `browser`
-// (in-memory storage, a YouTube tab with two videos, optional i18n catalog). Checks that the
-// controls save the right settings and that the pages are localized; saves light/dark
-// screenshots to dist/ui.
-// Usage: npm run build && node scripts/ui-test.mjs
+/*
+ * Popup and options tests with a fake `browser` (in-memory storage, a YouTube tab with videos,
+ * optional i18n catalog). Screenshots go to dist/ui.
+ * Usage: npm run build && node scripts/ui-test.mjs
+ */
 import { readFile, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { firefox } from 'playwright';
@@ -15,7 +15,7 @@ const italian = await catalog('it');
 const { server, base } = await serve('dist/extension');
 
 /** Fake `browser` namespace, injected before the page's scripts. */
-function stub({ granted, stored, legacy, catalog, lang, formatSource }) {
+function stub({ granted, stored, catalog, lang, formatSource }) {
   const area = (data) => ({
     async get(key) {
       return key in data ? { [key]: structuredClone(data[key]) } : {};
@@ -24,20 +24,16 @@ function stub({ granted, stored, legacy, catalog, lang, formatSource }) {
       for (const [k, v] of Object.entries(obj)) {
         const oldValue = data[k];
         data[k] = structuredClone(v);
-        for (const l of listeners) l({ [k]: { oldValue, newValue: structuredClone(v) } }, data === sync ? 'sync' : 'local');
+        for (const l of listeners) l({ [k]: { oldValue, newValue: structuredClone(v) } }, 'sync');
       }
-    },
-    async remove(key) {
-      delete data[key];
     },
   });
   const sync = stored ?? {};
-  const local = legacy ?? {};
   const listeners = [];
   const video = (o) => ({ id: '', session: 1, relevant: true, quality: 'high', sharpenOnly: false, degraded: false, costMs: 0, frames: 100, canvasRect: null, ...o });
-  window.__stub = { sync, local, opened: [] };
+  window.__stub = { sync, opened: [] };
   window.browser = {
-    storage: { sync: area(sync), local: area(local), onChanged: { addListener: (l) => listeners.push(l) } },
+    storage: { sync: area(sync), onChanged: { addListener: (l) => listeners.push(l) } },
     runtime: {
       getManifest: () => ({ version: '1.0.0' }),
       getURL: (p) => `moz-extension://test/${p}`,
@@ -78,9 +74,9 @@ const browser = await firefox.launch();
 await mkdir(OUT, { recursive: true });
 const { expect, finish } = reporter();
 
-async function open(path, { scheme = 'light', granted = true, stored, legacy, viewport, catalog, lang } = {}) {
+async function open(path, { scheme = 'light', granted = true, stored, viewport, catalog, lang } = {}) {
   const context = await browser.newContext({ colorScheme: scheme, viewport: viewport ?? { width: 320, height: 600 } });
-  await context.addInitScript(stub, { granted, stored, legacy, catalog, lang, formatSource: formatMessage.toString() });
+  await context.addInitScript(stub, { granted, stored, catalog, lang, formatSource: formatMessage.toString() });
   const page = await context.newPage();
   const errors = trackErrors(page, base);
   await page.goto(base + path);
@@ -150,18 +146,6 @@ for (const scheme of ['light', 'dark']) {
   await page.click('#grant');
   const opened = await page.evaluate(() => window.__stub.opened);
   expect('popup: opens the permission page', opened.some((u) => u.endsWith('onboarding.html')));
-  await context.close();
-}
-
-{
-  // Migration: v0 settings in storage.local → storage.sync.
-  const legacy = { settings: { enabled: false, mode: 'easu', sharpness: 0.2, denoise: true, showInfo: true } };
-  const { page, context } = await open('popup.html', { legacy });
-  await page.waitForSelector('#videos li');
-  const { sync, local } = await page.evaluate(() => window.__stub);
-  expect('v0 migration: copied to sync', sync.settings?.version === 2 && sync.settings.quality === 'high' && sync.settings.sharpness === 0 && sync.settings.showInfo === true);
-  expect('v0 migration: removed from local', !('settings' in local));
-  expect('v0 migration: popup consistent', !(await page.isChecked('#enabled')) && (await page.inputValue('#quality')) === 'high' && (await page.textContent('#sharpness-val')) === 'Off');
   await context.close();
 }
 

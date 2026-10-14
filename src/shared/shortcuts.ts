@@ -1,6 +1,3 @@
-// Table of the extension's shortcuts, as currently set in Firefox (the user can change them).
-// Descriptions come from the manifest, already localized.
-
 /** Fills `table` with one row per command: description and current shortcut. */
 export async function renderShortcuts(table: HTMLTableElement): Promise<void> {
   const commands = await browser.commands.getAll();

@@ -1,5 +1,4 @@
-// Localized strings via browser.i18n (extension/_locales). Outside the extension (test
-// harness injected into a page, node tests) it falls back to the English catalog.
+// browser.i18n, with the English catalog as fallback outside the extension (harness, node tests).
 import en from '../../extension/_locales/en/messages.json' with { type: 'json' };
 
 export interface CatalogEntry {

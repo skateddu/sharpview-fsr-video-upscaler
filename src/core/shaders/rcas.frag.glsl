@@ -1,6 +1,8 @@
-// FSR 1 RCAS (Robust Contrast Adaptive Sharpening).
-// Port of the fp32 path of ffx_fsr1.h (AMD, MIT license, see THIRD_PARTY_NOTICES.md).
-// Works 1:1: u_tex has the same size as the output.
+/*
+ * FSR 1 RCAS (Robust Contrast Adaptive Sharpening).
+ * Port of the fp32 path of ffx_fsr1.h (AMD, MIT license, see THIRD_PARTY_NOTICES.md).
+ * Works 1:1: u_tex has the same size as the output.
+ */
 
 uniform sampler2D u_tex;
 uniform float u_sharpness;  // 0..1: 1.0 = maximum sharpening (exp2(-stops) in the AMD original)
@@ -19,9 +21,9 @@ void main() {
   if (splitCompare(p)) return;
   ivec2 sp = ivec2(p);
 
-  //    b
-  //  d e f
-  //    h
+  /*   b
+     d e f
+       h   */
   vec3 b = fetch(sp + ivec2( 0, -1));
   vec3 d = fetch(sp + ivec2(-1,  0));
   vec3 e = fetch(sp);

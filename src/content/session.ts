@@ -288,8 +288,7 @@ export class VideoSession {
       }
       return null;
     } catch (e) {
-      // SecurityError: cross-origin frame without CORS, unreadable by WebGL. Checked by name:
-      // in content scripts the exception may come from another compartment (instanceof fails).
+      // Checked by name: the error may come from another compartment, where instanceof fails.
       if ((e as { name?: unknown } | null)?.name === 'SecurityError') return this.fail({ code: 'cross-origin' });
       return this.fail({ code: 'render-error', detail: errorText(e) });
     }

@@ -1,5 +1,4 @@
-// Upscaling eligibility and geometry for a <video>, from measurements already read from the
-// DOM. Pure logic (tested with node --test).
+// Upscaling eligibility and geometry of a <video>. Pure logic, tested with node --test.
 import { clipInsets, contentRect, type Rect } from '../core/geometry.ts';
 import type { Status } from '../shared/status.ts';
 

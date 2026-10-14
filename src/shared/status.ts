@@ -1,6 +1,4 @@
-// State of a video handled by the extension: typed codes and a single table mapping them to
-// localized messages, used by the label on the video, the popup and the logs. Pure logic
-// (tested with node --test).
+// Video states and their localized messages, shared by the label, the popup and the logs.
 import type { Quality } from '../core/modes.ts';
 
 /** How a status's detail is shown: as the message's placeholder, or appended in parentheses. */
@@ -47,7 +45,6 @@ export interface Status {
 
 /** State of a video, as seen by the popup, tests and diagnostics. */
 export interface VideoStatus extends Status {
-  /** id of the <video> element. */
   id: string;
   /** Session number: changes only when the session is recreated. */
   session: number;

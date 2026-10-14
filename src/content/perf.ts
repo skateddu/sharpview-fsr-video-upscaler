@@ -1,5 +1,4 @@
-// Pure logic for performance and GPU resources (tested with node --test, which runs
-// TypeScript by stripping types only: no parameter properties in constructors).
+// Pure logic, tested with node --test: type stripping only, so no constructor parameter properties.
 
 /** Consecutive seconds below the threshold before the governor steps in. */
 const STRIKE_LIMIT = 3;

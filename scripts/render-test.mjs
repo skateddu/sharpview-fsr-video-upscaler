@@ -1,11 +1,9 @@
-// Renderer regression test: opens the playground in Firefox (Playwright) with the test
-// pattern, renders every mode at ×3 and compares pixels with the reference images in
-// test/golden. Also checks recovery after losing the WebGL context.
-// Usage: npm run build && node scripts/render-test.mjs [--update-golden]
-//
-// The pattern contains text drawn by the browser: references depend a little on the
-// machine's fonts and GPU. On another machine, regenerate them with --update-golden and
-// check them by eye.
+/*
+ * Renderer regression test: renders the playground's test pattern in every mode at ×3 and
+ * compares it with test/golden, also after a WebGL context loss. The references depend a
+ * little on fonts and GPU: on another machine regenerate them and check them by eye.
+ * Usage: npm run build && node scripts/render-test.mjs [--update-golden]
+ */
 import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
 import { join } from 'node:path';
 import { firefox } from 'playwright';

@@ -1,6 +1,8 @@
-// FSR 1 EASU (Edge Adaptive Spatial Upsampling).
-// Port of the fp32 path of ffx_fsr1.h (AMD, MIT license, see THIRD_PARTY_NOTICES.md),
-// using texelFetch instead of textureGather, which WebGL2 lacks.
+/*
+ * FSR 1 EASU (Edge Adaptive Spatial Upsampling).
+ * Port of the fp32 path of ffx_fsr1.h (AMD, MIT license, see THIRD_PARTY_NOTICES.md),
+ * using texelFetch instead of textureGather, which WebGL2 lacks.
+ */
 
 uniform vec2 u_inSize;    // source size in pixels
 
@@ -14,8 +16,8 @@ float rcpSafe(float x) {
   return 1.0 / max(x, 1.0e-8);
 }
 
-// Accumulates edge direction and length for one of the 4 center texels.
-// lA up, lB left, lC center, lD right, lE down; w bilinear weight.
+/* Accumulates edge direction and length for one of the 4 center texels.
+   lA up, lB left, lC center, lD right, lE down; w bilinear weight. */
 void easuSet(inout vec2 dir, inout float len, float w,
              float lA, float lB, float lC, float lD, float lE) {
   float dc = lD - lC;
@@ -62,11 +64,11 @@ void main() {
   pp -= fp;
   ivec2 o = ivec2(fp);
 
-  // 12-tap footprint:
-  //    b c
-  //  e f g h
-  //  i j k l
-  //    n o
+  /* 12-tap footprint:
+        b c
+      e f g h
+      i j k l
+        n o    */
   vec3 bC = fetch(o + ivec2( 0, -1));
   vec3 cC = fetch(o + ivec2( 1, -1));
   vec3 eC = fetch(o + ivec2(-1,  0));

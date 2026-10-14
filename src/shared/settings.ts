@@ -1,5 +1,4 @@
-// Settings persistence in storage.sync (they follow the profile when Firefox Sync is on).
-// node --test can import it too (with a simulated `browser`): hence the .ts extensions.
+// Settings in storage.sync, so they follow the Firefox account. Also imported by node --test.
 import { qualityMode, type Quality } from '../core/modes.ts';
 import type { RenderOptions } from '../core/upscaler.ts';
 import { normalizeSettings, type Settings } from './schema.ts';
@@ -10,15 +9,7 @@ const KEY = 'settings';
 
 export async function loadSettings(): Promise<Settings> {
   const stored = await browser.storage.sync.get(KEY);
-  if (stored[KEY] !== undefined) return normalizeSettings(stored[KEY]);
-  // Migration from v0, stored in storage.local.
-  const legacy = await browser.storage.local.get(KEY);
-  const settings = normalizeSettings(legacy[KEY]);
-  if (legacy[KEY] !== undefined) {
-    await browser.storage.sync.set({ [KEY]: settings });
-    await browser.storage.local.remove(KEY);
-  }
-  return settings;
+  return normalizeSettings(stored[KEY]);
 }
 
 /** Queued writes: each change starts from the result of the previous one. */

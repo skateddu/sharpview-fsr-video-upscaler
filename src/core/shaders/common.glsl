@@ -7,8 +7,7 @@ uniform float u_split;     // output x left of which plain bilinear is shown; < 
 
 out vec4 fragColor;
 
-// Output pixel position with y pointing down and centers at .5,
-// the same convention as textures uploaded from <video>.
+// Output pixel position, y down with centers at .5, like textures uploaded from <video>.
 vec2 outPos() {
   vec2 p = gl_FragCoord.xy;
   if (u_flipY) p.y = u_outSize.y - p.y;

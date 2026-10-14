@@ -1,8 +1,9 @@
-// End-to-end test of the content script logic (dist/test/harness.js) in Firefox with
-// Playwright, on a page with videos in different layouts (test/e2e/fixture.html).
-// It does not load the extension (Playwright cannot in Firefox): toolbar, permissions and
-// storage are tested by hand with `npm start`.
-// Usage: npm run build && node scripts/e2e.mjs
+/*
+ * End-to-end test of the content script logic (dist/test/harness.js) on test/e2e/fixture.html.
+ * Playwright cannot load extensions in Firefox: toolbar, permissions and storage are tested
+ * by hand with `npm start`.
+ * Usage: npm run build && node scripts/e2e.mjs
+ */
 import { writeFile, mkdir } from 'node:fs/promises';
 import { firefox } from 'playwright';
 import { reporter, serve, trackErrors } from './lib.mjs';
@@ -95,8 +96,7 @@ async function checkAligned(target, id, content, d) {
   expect(`${id}: frames drawn`, d.frames > 0, `${d.frames}`);
 }
 
-// Expected canvas rectangle: video position + border + content rectangle, computed here by
-// hand (independently from src/core/geometry.ts).
+// Expected content rectangles, computed by hand independently from src/core/geometry.ts.
 const expected = {
   contain: { x: 0, y: 90, width: 960, height: 540 },
   cover: { x: (640 - (640 * SRC_W) / SRC_H) / 2, y: 0, width: (640 * SRC_W) / SRC_H, height: 640 },

@@ -1,5 +1,4 @@
-// Translation catalogs: same keys and placeholders in every language, and every key used by
-// the code, the HTML pages and the manifest exists.
+// Every language has the same keys and placeholders, and every key in use exists.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';

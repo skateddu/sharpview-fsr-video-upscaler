@@ -1,11 +1,7 @@
-// Settings schema and per-site rules. Pure logic, no extension APIs: tested with node --test
-// (hence the .ts extensions in imports).
+// Pure logic with no extension APIs, so node --test can import it (hence the .ts extensions).
 import { DEFAULT_SHARPNESS, QUALITIES, type Quality } from '../core/modes.ts';
 
-/**
- * v1: `mode` (4 algorithms) and `sharpness` in stops of attenuation.
- * v2: `quality` (high = FSR1, light = bilinear + RCAS) and `sharpness` as a linear % (0 = off).
- */
+/** Stored with the settings, to tell schema versions apart if a future one needs a migration. */
 export const SETTINGS_VERSION = 2;
 
 /** all: active everywhere except excluded sites · allowlist: only on allowed sites. */
@@ -61,38 +57,9 @@ export const MIN_SCALE_CHOICES: readonly { value: number; labelKey: string }[] =
   { value: 2, labelKey: 'optionsMinScale200' },
 ];
 
-/** Sharpness in stops of attenuation (v0/v1) → linear % (v2): 0.2 stops → 87%. */
-function stopsToPercent(stops: number): number {
-  return Math.round(Math.pow(2, -stops) * 100);
-}
-
-/** v0/v1 fields translated to v2. */
-function migrateV1(r: Record<string, unknown>): Record<string, unknown> {
-  const out: Record<string, unknown> = { ...r };
-  delete out.mode;
-  const stops = typeof r.sharpness === 'number' && Number.isFinite(r.sharpness) ? r.sharpness : 0.2;
-  out.sharpness = stopsToPercent(stops);
-  switch (r.mode) {
-    case 'easu': // FSR1 without sharpening
-      out.quality = 'high';
-      out.sharpness = 0;
-      break;
-    case 'bilinear-rcas':
-      out.quality = 'light';
-      break;
-    default: // fsr, bilinear (= the browser alone) or missing
-      out.quality = 'high';
-  }
-  return out;
-}
-
-/**
- * Turns any stored value (from older versions, or corrupted) into a valid schema of the
- * latest version. v0 (no `version`) has the same fields as v1.
- */
+/** Turns any stored value, even a corrupted or partial one, into valid settings. */
 export function normalizeSettings(raw: unknown): Settings {
-  let r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
-  if (Object.keys(r).length && (typeof r.version !== 'number' || r.version < 2)) r = migrateV1(r);
+  const r = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   const d = DEFAULT_SETTINGS;
   const bool = (k: keyof Settings) => (typeof r[k] === 'boolean' ? (r[k] as boolean) : (d[k] as boolean));
   const num = (k: keyof Settings, min: number, max: number) => {

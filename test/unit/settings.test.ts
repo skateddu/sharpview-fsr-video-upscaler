@@ -16,7 +16,6 @@ const tick = () => new Promise((r) => setTimeout(r, Math.random() * 3));
         Object.assign(sync, structuredClone(obj));
       },
     },
-    local: { get: async () => ({}), remove: async () => {} },
     onChanged: { addListener: () => {} },
   },
 };
@@ -28,8 +27,7 @@ beforeEach(() => {
 });
 
 test('updateSettings: changes in quick succession are not lost', async () => {
-  // 11 toggles fired together (like a shortcut held down): starting from on, an odd number of
-  // toggles must leave it off.
+  // 11 toggles at once, like a shortcut held down: an odd number must leave it off.
   await Promise.all(Array.from({ length: 11 }, () => updateSettings((s) => ({ enabled: !s.enabled }))));
   assert.equal((await loadSettings()).enabled, false);
 });

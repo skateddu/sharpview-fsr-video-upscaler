@@ -5,9 +5,8 @@ export type UpscaleMode = 'fsr' | 'easu' | 'bilinear-rcas' | 'bilinear';
 export const UPSCALE_MODES: readonly UpscaleMode[] = ['fsr', 'easu', 'bilinear-rcas', 'bilinear'];
 
 /**
- * Quality offered to the user: high = FSR1 (EASU + RCAS), light = bilinear + RCAS. The four
- * modes remain for the playground and tests: "EASU only" is high with zero sharpening, and
- * "bilinear" is what the browser already does.
+ * Quality offered to the user: high = FSR1 (EASU + RCAS), light = bilinear + RCAS. The other
+ * two modes are for the playground and the tests.
  */
 export type Quality = 'high' | 'light';
 
