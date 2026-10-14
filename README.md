@@ -69,10 +69,15 @@ allowed sites, the activation threshold and sharpening for videos that are not e
 
 Shortcuts can be changed in `about:addons` → gear icon → Manage Extension Shortcuts.
 
-**Limitations**: DRM-protected videos (Netflix, Prime Video, Disney+…) cannot be read by the
-GPU and are never processed. Firefox's Picture-in-Picture window shows the original video. If a
-site places the player controls before the `<video>` in the DOM without a `z-index`, the
-overlay could cover them (not seen on YouTube, Twitch or Dailymotion).
+**Limitations**:
+
+- DRM-protected videos (Netflix, Prime Video, Disney+…) cannot be read by the GPU and are never
+  processed.
+- Firefox's Picture-in-Picture window shows the original video.
+- If a site places the player controls before the `<video>` in the DOM without a `z-index`, the
+  overlay could cover them (not seen on YouTube, Twitch or Dailymotion).
+- On pages that keep the browser busy, such as a live stream with a fast chat, a few frames per
+  second of a 60 fps video can be skipped; the native video is not affected.
 
 ## How It Works
 
