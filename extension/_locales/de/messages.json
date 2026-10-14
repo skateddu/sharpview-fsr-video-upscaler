@@ -75,6 +75,10 @@
   "optionsBlocked": { "message": "Ausgeschlossene Websites" },
   "optionsAllowed": { "message": "Erlaubte Websites" },
   "optionsSitesHelp": { "message": "Eine Website pro Zeile. Subdomains sind eingeschlossen: youtube.com gilt auch für m.youtube.com. Die Listen lassen sich auch im Popup über den Website-Schalter ändern." },
+  "optionsSitesIgnored": {
+    "message": "Ignoriert, keine gültigen Websites: $ENTRIES$",
+    "placeholders": { "entries": { "content": "$1" } }
+  },
   "optionsActivation": { "message": "Aktivierung" },
   "optionsMinScale": { "message": "Mindestvergrößerung, ab der das Upscaling startet" },
   "optionsMinScaleHelp": { "message": "Unterhalb der Schwelle wird das Originalvideo angezeigt, ohne GPU-Last." },

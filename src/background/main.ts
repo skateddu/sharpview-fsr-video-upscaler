@@ -15,7 +15,7 @@ async function updateBadge(tabId: number, url: string | undefined): Promise<void
   const text = !s.enabled || !host ? '' : isSiteEnabled(s, host) ? 'ON' : 'OFF';
   await Promise.all([
     browser.action.setBadgeText({ tabId, text }),
-    browser.action.setBadgeBackgroundColor({ tabId, color: text === 'ON' ? '#2b8a3e' : '#868e96' }),
+    browser.action.setBadgeBackgroundColor({ tabId, color: text === 'ON' ? '#2b7a39' : '#868e96' }),
   ]);
 }
 

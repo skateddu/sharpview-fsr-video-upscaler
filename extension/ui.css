@@ -6,7 +6,7 @@
   --border: #dcdfe4;
   --text: #1b1f24;
   --muted: #6a737d;
-  --accent: #2b8a3e;
+  --accent: #2b7a39;
   --accent-text: #ffffff;
   --warn-bg: #fff4e5;
   --warn-text: #8a4b00;
@@ -39,6 +39,7 @@ h1 { font-size: 15px; margin: 0; }
 h2 { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 8px; }
 a { color: var(--focus); }
 .muted { color: var(--muted); }
+.warn { color: var(--warn-text); }
 
 select, input[type=range], textarea { width: 100%; }
 select, textarea, button {

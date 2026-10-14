@@ -75,6 +75,10 @@
   "optionsBlocked": { "message": "Sitios excluidos" },
   "optionsAllowed": { "message": "Sitios permitidos" },
   "optionsSitesHelp": { "message": "Un sitio por línea. Se incluyen los subdominios: youtube.com también cubre m.youtube.com. También se pueden cambiar desde el panel, con el interruptor del sitio." },
+  "optionsSitesIgnored": {
+    "message": "Ignorados, no son sitios válidos: $ENTRIES$",
+    "placeholders": { "entries": { "content": "$1" } }
+  },
   "optionsActivation": { "message": "Activación" },
   "optionsMinScale": { "message": "Ampliación mínima para activar el escalado" },
   "optionsMinScaleHelp": { "message": "Por debajo del umbral se muestra el vídeo original, sin coste para la GPU." },

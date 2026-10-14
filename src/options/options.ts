@@ -20,6 +20,7 @@ const allowed = $<HTMLTextAreaElement>('allowedSites');
 const minScale = $<HTMLSelectElement>('minScale');
 const sharpenNative = $<HTMLInputElement>('sharpenNative');
 const saved = $<HTMLElement>('saved');
+const ignored = $<HTMLElement>('ignored');
 
 localizePage();
 document.title = t('optionsTitle');
@@ -52,10 +53,11 @@ async function save(patch: Partial<Settings>): Promise<void> {
 
 /** Lines (or comma-separated entries) → valid hostnames; pasted URLs are accepted too. */
 function parseList(text: string): string[] {
-  return text
-    .split(/[\n,]+/)
-    .map((line) => normalizeHost(line))
-    .filter((h): h is string => !!h);
+  const entries = text.split(/[\n,]+/).map((line) => line.trim()).filter(Boolean);
+  const invalid = entries.filter((entry) => !normalizeHost(entry));
+  ignored.textContent = invalid.length ? t('optionsSitesIgnored', invalid.join(', ')) : '';
+  ignored.hidden = !invalid.length;
+  return entries.map((entry) => normalizeHost(entry)).filter((h): h is string => !!h);
 }
 
 for (const r of radios) r.addEventListener('change', () => save({ siteMode: r.value as SiteMode }));

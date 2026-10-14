@@ -23,6 +23,23 @@ export async function renderShortcuts(table: HTMLTableElement): Promise<void> {
   );
 }
 
+/**
+ * Shows the current shortcut of each command in [data-shortcut] elements (as text) and
+ * [data-shortcut-title] elements (as tooltip); unassigned ones are hidden.
+ */
+export async function showShortcuts(root: ParentNode = document): Promise<void> {
+  const keys = new Map((await browser.commands.getAll()).map((c) => [c.name, c.shortcut ?? '']));
+  for (const el of root.querySelectorAll<HTMLElement>('[data-shortcut]')) {
+    el.textContent = keys.get(el.dataset.shortcut!) ?? '';
+    el.hidden = !el.textContent;
+  }
+  for (const el of root.querySelectorAll<HTMLElement>('[data-shortcut-title]')) {
+    const key = keys.get(el.dataset.shortcutTitle!);
+    if (key) el.title = key;
+    else el.removeAttribute('title');
+  }
+}
+
 type CommandsWithSettings = typeof browser.commands & { openShortcutSettings?: () => Promise<void> };
 
 /** Whether Firefox can open its shortcut settings page (Firefox 137+). */

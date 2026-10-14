@@ -30,7 +30,7 @@
   <header>
     <img src="icons/icon.svg" alt="">
     <h1 data-i18n="brandName">Sharpview</h1>
-    <label class="switch" title="Alt+Shift+U">
+    <label class="switch" data-shortcut-title="toggle">
       <input type="checkbox" id="enabled" aria-label="Turn upscaling on" data-i18n-aria-label="popupMasterSwitch">
       <span></span>
     </label>
@@ -54,7 +54,7 @@
 
   <section id="controls">
     <label class="field">
-      <div class="field-head"><span data-i18n="popupQuality">Quality</span><kbd>Alt+Shift+G</kbd></div>
+      <div class="field-head"><span data-i18n="popupQuality">Quality</span><kbd data-shortcut="toggle-quality" hidden></kbd></div>
       <select id="quality"></select>
     </label>
     <label class="field" id="sharpness-field">
@@ -62,8 +62,8 @@
       <input type="range" id="sharpness" min="0" max="100" step="1">
     </label>
     <label class="check" id="denoise-field"><input type="checkbox" id="denoise"> <span data-i18n="popupDenoise">Less sharpening on noise</span></label>
-    <label class="check"><input type="checkbox" id="showInfo"> <span data-i18n="popupShowInfo">Info on the video</span> <kbd>Alt+Shift+I</kbd></label>
-    <label class="check"><input type="checkbox" id="compare"> <span data-i18n="popupCompare">A/B comparison</span> <kbd>Alt+Shift+O</kbd></label>
+    <label class="check"><input type="checkbox" id="showInfo"> <span data-i18n="popupShowInfo">Info on the video</span> <kbd data-shortcut="toggle-info" hidden></kbd></label>
+    <label class="check"><input type="checkbox" id="compare"> <span data-i18n="popupCompare">A/B comparison</span> <kbd data-shortcut="toggle-compare" hidden></kbd></label>
   </section>
 
   <section>

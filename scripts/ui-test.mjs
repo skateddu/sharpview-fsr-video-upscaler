@@ -57,8 +57,8 @@ function stub({ granted, stored, catalog, lang, formatSource }) {
         { name: '_execute_action', shortcut: '', description: 'Open the popup' },
         { name: 'toggle', shortcut: 'Alt+Shift+U', description: 'Turn upscaling on/off' },
         { name: 'toggle-quality', shortcut: 'Alt+Shift+G', description: 'Switch quality' },
-        { name: 'toggle-info', shortcut: 'Alt+Shift+I', description: 'Info on the video' },
-        { name: 'toggle-compare', shortcut: 'Alt+Shift+O', description: 'A/B comparison' },
+        { name: 'toggle-info', shortcut: 'Ctrl+Alt+I', description: 'Info on the video' },
+        { name: 'toggle-compare', shortcut: '', description: 'A/B comparison' },
       ],
     },
   };
@@ -111,6 +111,9 @@ for (const scheme of ['light', 'dark']) {
   expect('popup: site switch → enabled again', s.blockedSites.length === 0);
 
   expect('popup: two qualities', (await page.locator('#quality option').count()) === 2);
+  expect('popup: shortcuts read from Firefox', (await page.textContent('[data-shortcut=toggle-info]')) === 'Ctrl+Alt+I' &&
+    (await page.getAttribute('[data-shortcut-title=toggle]', 'title')) === 'Alt+Shift+U');
+  expect('popup: unassigned shortcut hidden', await page.locator('[data-shortcut=toggle-compare]').isHidden());
   await page.selectOption('#quality', 'light');
   s = await settingsOf(page);
   expect('popup: quality saved', s.quality === 'light');
@@ -122,6 +125,7 @@ for (const scheme of ['light', 'dark']) {
   await page.locator('#sharpness').fill('0');
   s = await settingsOf(page);
   expect('popup: sharpness 0 → off', s.sharpness === 0 && (await page.textContent('#sharpness-val')) === 'Off');
+  expect('popup: slider announces "Off"', (await page.getAttribute('#sharpness', 'aria-valuetext')) === 'Off');
   expect('popup: denoise hidden when sharpening is off', await page.locator('#denoise-field').isHidden());
   await page.locator('#sharpness').fill('87');
 
@@ -181,6 +185,10 @@ for (const scheme of ['light', 'dark']) {
   await page.locator('#blockedSites').blur();
   let s = await settingsOf(page);
   expect('options: excluded list normalized', s?.blockedSites?.join() === 'example.com,vimeo.com', JSON.stringify(s?.blockedSites));
+  expect('options: invalid entry reported', (await page.textContent('#ignored')).includes('not valid!'));
+  await page.fill('#blockedSites', 'example.com');
+  await page.locator('#blockedSites').blur();
+  expect('options: notice cleared', await page.locator('#ignored').isHidden());
 
   await page.check('input[name=siteMode][value=allowlist]');
   s = await settingsOf(page);

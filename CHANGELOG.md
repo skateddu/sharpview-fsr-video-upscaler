@@ -19,6 +19,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - README links the add-on on addons.mozilla.org; roadmap removed
+- **Accessibility**: darker green in the light theme, for at least 4.5:1 contrast on text and
+  buttons; the sharpness slider announces the value it shows ("Off" or the percentage)
+- **Options**: site entries that are not valid are listed instead of disappearing silently
+
+### Fixed
+
+- The popup shows the shortcuts set in Firefox instead of the default ones, and hides the
+  unassigned ones
 
 ## [1.0.0] - 2026-10-08
 

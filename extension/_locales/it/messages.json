@@ -75,6 +75,10 @@
   "optionsBlocked": { "message": "Siti esclusi" },
   "optionsAllowed": { "message": "Siti consentiti" },
   "optionsSitesHelp": { "message": "Un sito per riga. Vale anche per i sottodomini: youtube.com include m.youtube.com. Puoi cambiarli anche dal popup, con l'interruttore del sito." },
+  "optionsSitesIgnored": {
+    "message": "Ignorati, non sono siti validi: $ENTRIES$",
+    "placeholders": { "entries": { "content": "$1" } }
+  },
   "optionsActivation": { "message": "Attivazione" },
   "optionsMinScale": { "message": "Ingrandimento minimo per attivare l'upscaling" },
   "optionsMinScaleHelp": { "message": "Sotto la soglia resta il video originale, senza costi per la GPU." },

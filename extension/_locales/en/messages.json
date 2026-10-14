@@ -75,6 +75,10 @@
   "optionsBlocked": { "message": "Excluded sites" },
   "optionsAllowed": { "message": "Allowed sites" },
   "optionsSitesHelp": { "message": "One site per line. Subdomains are included: youtube.com also covers m.youtube.com. You can also change them from the popup, with the site switch." },
+  "optionsSitesIgnored": {
+    "message": "Ignored, not a valid site: $ENTRIES$",
+    "placeholders": { "entries": { "content": "$1" } }
+  },
   "optionsActivation": { "message": "Activation" },
   "optionsMinScale": { "message": "Minimum magnification to activate upscaling" },
   "optionsMinScaleHelp": { "message": "Below the threshold the original video is shown, at no GPU cost." },

@@ -13,6 +13,7 @@ import type { FrameStatus, Message } from '../shared/messages';
 import { describeStatus, type VideoStatus } from '../shared/status';
 import { hasSiteAccess, openOnboarding } from '../shared/permissions';
 import { localizePage, t } from '../shared/i18n';
+import { showShortcuts } from '../shared/shortcuts';
 import { byId as $ } from '../shared/dom';
 
 const enabled = $<HTMLInputElement>('enabled');
@@ -30,6 +31,7 @@ const compare = $<HTMLInputElement>('compare');
 const videos = $<HTMLUListElement>('videos');
 
 localizePage();
+showShortcuts();
 for (const q of QUALITIES) quality.add(new Option(t(QUALITY_KEYS[q].label), q));
 $('version').textContent = `v${browser.runtime.getManifest().version}`;
 
@@ -58,6 +60,7 @@ function render(): void {
 
 function showSharpness(): void {
   sharpnessVal.textContent = sharpness.value === '0' ? t('popupSharpnessOff') : `${sharpness.value}%`;
+  sharpness.setAttribute('aria-valuetext', sharpnessVal.textContent);
 }
 
 async function save(patch: Partial<Settings>): Promise<void> {
