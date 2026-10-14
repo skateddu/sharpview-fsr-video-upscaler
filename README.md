@@ -1,6 +1,6 @@
 # Sharpview – FSR Video Upscaler
 
-[![Firefox Add-on](https://img.shields.io/amo/v/sharpview-fsr-video-upscaler?logo=firefoxbrowser&logoColor=white&label=firefox%20add-on)](https://addons.mozilla.org/firefox/addon/sharpview-fsr-video-upscaler/)
+[![Firefox Add-on](https://img.shields.io/amo/v/sharpview-fsr-video-upscaler?logo=firefoxbrowser&logoColor=white&label=firefox%20add-on)](https://addons.mozilla.org/en-US/firefox/addon/sharpview-fsr-video-upscaler/)
 [![CI](https://github.com/skateddu/sharpview-fsr-video-upscaler/actions/workflows/ci.yml/badge.svg)](https://github.com/skateddu/sharpview-fsr-video-upscaler/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/skateddu/sharpview-fsr-video-upscaler)](LICENSE.md)
 [![Firefox >= 140](https://img.shields.io/badge/firefox-%3E%3D140-FF7139?logo=firefoxbrowser&logoColor=white)](https://www.mozilla.org/firefox/)
@@ -31,7 +31,7 @@ recent NVIDIA, AMD and Intel ones.
 
 ## Installation
 
-Install it from **[Firefox Add-ons](https://addons.mozilla.org/firefox/addon/sharpview-fsr-video-upscaler/)**
+Install it from **[Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/sharpview-fsr-video-upscaler/)**
 (Firefox 140 or later). On first install a page asks for access to sites: the extension needs it
 to find the videos on web pages.
 
