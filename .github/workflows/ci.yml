@@ -50,10 +50,6 @@ jobs:
       - name: UI tests (popup and options)
         run: npm run test:ui
 
-      # The rendering and end-to-end tests are not run here: the rendering references depend on
-      # the GPU and fonts of the machine that generated them, and the e2e suite needs WebGL2 and
-      # MediaRecorder in a headless Firefox. Both run locally with `npm test`.
-
       - name: Build release package
         run: npm run package
 

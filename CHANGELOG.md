@@ -7,6 +7,11 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Release workflow**: pushing a `vX.Y.Z` tag builds the package and publishes a GitHub release
+  with the zip and the changelog notes; it can also be run by hand for an existing tag
+
 ## [1.0.0] - 2026-10-08
 
 First release.

@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to release (e.g. v1.0.0)
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build package and publish release
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check version
+        run: |
+          version="${TAG#v}"
+          manifest=$(node -p "require('./extension/manifest.json').version")
+          package=$(node -p "require('./package.json').version")
+          if [ "$manifest" != "$version" ] || [ "$package" != "$version" ]; then
+            echo "::error::Tag $TAG does not match manifest.json ($manifest) and package.json ($package)"
+            exit 1
+          fi
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Build release package
+        run: npm run package
+
+      - name: Extract release notes
+        run: |
+          awk -v v="${TAG#v}" '
+            /^## \[/ { if (found) exit; if (index($0, "## [" v "]") == 1) { found = 1; next } }
+            found
+          ' CHANGELOG.md > release-notes.md
+          echo "Install from [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/sharpview-fsr-video-upscaler/). The zip below is the unsigned package, for temporary loading from \`about:debugging\`." >> release-notes.md
+
+      - name: Publish GitHub release
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" web-ext-artifacts/*.zip --clobber
+          else
+            gh release create "$TAG" web-ext-artifacts/*.zip --title "$TAG" --notes-file release-notes.md --verify-tag
+          fi
