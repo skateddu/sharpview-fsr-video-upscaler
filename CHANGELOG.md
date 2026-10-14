@@ -7,6 +7,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-10-14
+
 ### Added
 
 - **Sharpening at native size**: an option to apply RCAS sharpening only to videos below the
@@ -69,5 +71,6 @@ First release.
 - **Tests**: unit (node --test), rendering regression against reference images, end-to-end on a
   fixture with 13 layouts, popup and options in English and Italian; CI on GitHub Actions
 
-[Unreleased]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/skateddu/sharpview-fsr-video-upscaler/releases/tag/v1.0.0
