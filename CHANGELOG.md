@@ -25,6 +25,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Black video with audio playing when upscaling started before the first frame was decoded (e.g.
+  a live stream still loading): the upscaler texture stayed empty until the extension was
+  turned off and on
 - The popup shows the shortcuts set in Firefox instead of the default ones, and hides the
   unassigned ones
 

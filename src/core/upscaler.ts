@@ -157,12 +157,12 @@ export class Upscaler {
     gl.activeTexture(gl.TEXTURE0 + SRC_UNIT);
     gl.bindTexture(gl.TEXTURE_2D, this.srcTex);
     if (w !== this.srcW || h !== this.srcH) {
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, gl.RGBA, gl.UNSIGNED_BYTE, source);
+      // Explicit storage: texImage2D from a video with no frame yet would leave the texture empty for good.
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
       this.srcW = w;
       this.srcH = h;
-    } else {
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, source);
     }
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, source);
   }
 
   private ensureMid(w: number, h: number): void {

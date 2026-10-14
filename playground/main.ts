@@ -303,4 +303,4 @@ if (params.has('pattern')) {
 }
 
 // Hook for automated tests (scripts/render-test.mjs).
-(window as unknown as { __playground: unknown }).__playground = { draw, canvas, upscaler: () => upscaler };
+(window as unknown as { __playground: unknown }).__playground = { draw, canvas, upscaler: () => upscaler, Upscaler };

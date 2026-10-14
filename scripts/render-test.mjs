@@ -114,6 +114,41 @@ const restored = await page.evaluate(async () => {
 if (restored) await check('fsr-after-restore', await snapshot(), 'fsr');
 else expect('context-restore', false, 'context not restored');
 
+// First frame drawn when the video only has its metadata: playback must not stay black.
+const firstFrame = await page.evaluate(async () => {
+  const src = Object.assign(document.createElement('canvas'), { width: 320, height: 180 });
+  const ctx = src.getContext('2d');
+  const paint = setInterval(() => {
+    ctx.fillStyle = 'rgb(200, 60, 40)';
+    ctx.fillRect(0, 0, 320, 180);
+  }, 33);
+  const recorder = new MediaRecorder(src.captureStream(30), { mimeType: 'video/webm' });
+  const chunks = [];
+  recorder.ondataavailable = (e) => chunks.push(e.data);
+  recorder.start();
+  await new Promise((r) => setTimeout(r, 1500));
+  recorder.stop();
+  await new Promise((r) => (recorder.onstop = r));
+  clearInterval(paint);
+  const video = Object.assign(document.createElement('video'), { muted: true, preload: 'metadata' });
+  video.src = URL.createObjectURL(new Blob(chunks, { type: 'video/webm' }));
+  await new Promise((r) => video.addEventListener('loadedmetadata', r, { once: true }));
+  const { Upscaler } = window.__playground;
+  const upscaler = new Upscaler(Object.assign(document.createElement('canvas'), { width: 64, height: 64 }));
+  const opts = { mode: 'bilinear', sharpness: 0, denoise: false, split: -1 };
+  const readyState = video.readyState;
+  upscaler.render(video, video.videoWidth, video.videoHeight, opts);
+  await video.play();
+  await new Promise((r) => setTimeout(r, 300));
+  upscaler.render(video, video.videoWidth, video.videoHeight, opts);
+  const px = new Uint8Array(4);
+  upscaler.gl.readPixels(32, 32, 1, 1, upscaler.gl.RGBA, upscaler.gl.UNSIGNED_BYTE, px);
+  return { readyState, px: [...px] };
+});
+expect('first draw before the first frame, then playback is not black',
+  firstFrame.readyState < 2 && firstFrame.px[0] > 150 && firstFrame.px[1] < 100,
+  `readyState ${firstFrame.readyState}, pixel ${firstFrame.px}`);
+
 await page.click('#bench');
 await page.waitForFunction(() => document.getElementById('bench-result').textContent !== '');
 console.log(await page.locator('#bench-result').textContent());
