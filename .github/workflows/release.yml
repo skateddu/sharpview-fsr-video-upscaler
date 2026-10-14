@@ -53,7 +53,7 @@ jobs:
       - name: Extract release notes
         run: |
           awk -v v="${TAG#v}" '
-            /^## \[/ { if (found) exit; if (index($0, "## [" v "]") == 1) { found = 1; next } }
+            /^## \[|^\[.+\]: / { if (found) exit; if (index($0, "## [" v "]") == 1) { found = 1; next } }
             found
           ' CHANGELOG.md > release-notes.md
           echo "Install from [Firefox Add-ons](https://addons.mozilla.org/firefox/addon/sharpview-fsr-video-upscaler/). The zip below is the unsigned package, for temporary loading from \`about:debugging\`." >> release-notes.md
