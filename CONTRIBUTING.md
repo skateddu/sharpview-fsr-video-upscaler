@@ -68,8 +68,9 @@ per frame.
 
 - **English everywhere**: code, comments, logs, docs and commit messages.
 - **Localized UI**: every user-facing string is a key in `extension/_locales/en/messages.json`
-  (the reference) **and** `extension/_locales/it/messages.json`. Use `t()` in code and
-  `data-i18n` in HTML; a unit test fails if a key is missing from either catalog.
+  (the reference) **and** in every other catalog under `extension/_locales` (it, fr, de, es).
+  Use `t()` in code and `data-i18n` in HTML; a unit test fails if a key is missing from any
+  catalog.
 - **Pure logic stays testable**: modules under `src/core`, `src/shared` and the pure parts of
   `src/content` (`layout.ts`, `perf.ts`) must not touch extension APIs, so `node --test` can
   import them.

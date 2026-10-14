@@ -10,7 +10,8 @@ import { formatMessage } from '../src/shared/i18n.ts';
 import { reporter, serve, trackErrors } from './lib.mjs';
 
 const OUT = 'dist/ui';
-const italian = JSON.parse(await readFile('extension/_locales/it/messages.json', 'utf8'));
+const catalog = async (lang) => JSON.parse(await readFile(`extension/_locales/${lang}/messages.json`, 'utf8'));
+const italian = await catalog('it');
 const { server, base } = await serve('dist/extension');
 
 /** Fake `browser` namespace, injected before the page's scripts. */
@@ -219,6 +220,22 @@ for (const scheme of ['light', 'dark']) {
   expect('options (it): localized', text.includes('Siti esclusi') && text.includes('Scorciatoie') && text.includes('consigliato'));
   expect('options (it): title', (await page.title()) === 'Sharpview · Impostazioni');
   await context.close();
+}
+
+// The other languages: translated and no wider than the popup (German strings are the longest).
+for (const lang of ['de', 'fr', 'es']) {
+  const messages = await catalog(lang);
+  const pages = [['popup.html', {}], ['options.html', { viewport: { width: 900, height: 900 } }]];
+  for (const [path, options] of pages) {
+    const { page, context, errors } = await open(path, { ...options, catalog: messages, lang });
+    await page.waitForSelector(path === 'popup.html' ? '#videos .dot' : '#shortcuts tr');
+    await page.screenshot({ path: join(OUT, `${path.replace('.html', '')}-${lang}.png`), fullPage: true });
+    const key = path === 'popup.html' ? 'popupQuality' : 'optionsSites';
+    expect(`${path} (${lang}): localized`, (await page.textContent('body')).includes(messages[key].message));
+    expect(`${path} (${lang}): no horizontal overflow`, await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    expect(`${path} (${lang}): no errors`, errors.length === 0, errors.join(' | '));
+    await context.close();
+  }
 }
 
 await finish(() => browser.close(), () => server.close());

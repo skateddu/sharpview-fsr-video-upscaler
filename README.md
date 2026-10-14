@@ -27,7 +27,7 @@ recent NVIDIA, AMD and Intel ones.
 - **A/B comparison**: plain bilinear on the left, upscaler on the right, to judge the result
 - **Info label**: input and output resolution, scale and fps on the video, or why it stays native
 - **Private**: no network requests, no data collection; settings sync with your Firefox account
-- **Localized**: English and Italian
+- **Localized**: English, Italian, French, German and Spanish
 
 ## Installation
 
@@ -120,13 +120,13 @@ result on video. Firefox's native RTX Video Super Resolution only works on NVIDI
 sharpview-fsr-video-upscaler/
 ├── .github/                  # CI and release workflows, issue and pull request templates
 ├── extension/                # Manifest, icon, static HTML, CSS
-│   └── _locales/             # en (reference) and it message catalogs
+│   └── _locales/             # en (reference), it, fr, de, es message catalogs
 ├── playground/               # Standalone page to compare modes and measure cost
 ├── scripts/
 │   ├── build.mjs             # esbuild: extension, playground, test harness
 │   ├── render-test.mjs       # Rendering regression against test/golden
 │   ├── e2e.mjs               # Content script on a fixture with 13 layouts
-│   ├── ui-test.mjs           # Popup and options, in English and Italian
+│   ├── ui-test.mjs           # Popup and options, in every language
 │   └── lib.mjs               # Shared test helpers: static server, checks, page errors
 ├── src/
 │   ├── core/                 # WebGL2 renderer: FSR1 shaders, pipeline, geometry, frame loop
@@ -173,7 +173,7 @@ mode.
 - **End-to-end**: the content script on a fixture page with 13 layouts (iframe, shadow DOM,
   transforms, object-fit/position, off screen, DRM via ClearKey, cross-origin), plus frame
   cadence, source changes, moved and removed videos and the slow-GPU fallback.
-- **UI**: popup and options with a simulated `browser`, in English and Italian.
+- **UI**: popup and options with a simulated `browser`, in every language.
 
 Playwright cannot load extensions in Firefox, so the toolbar, permissions and real sites are
 checked by hand with `npm start`.

@@ -36,10 +36,10 @@ function usedKeys(): Set<string> {
   return keys;
 }
 
-test('English is the reference language and Italian is provided', () => {
+test('English is the reference language and the other languages are provided', () => {
   const manifest = JSON.parse(readFileSync('extension/manifest.json', 'utf8'));
   assert.equal(manifest.default_locale, 'en');
-  assert.ok(catalogs.en && catalogs.it);
+  assert.deepEqual(Object.keys(catalogs).sort(), ['de', 'en', 'es', 'fr', 'it']);
 });
 
 test('every language has exactly the keys of the English catalog', () => {
