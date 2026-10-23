@@ -26,6 +26,7 @@ const sharpness = $<HTMLInputElement>('sharpness');
 const sharpnessVal = $<HTMLElement>('sharpness-val');
 const denoiseField = $<HTMLElement>('denoise-field');
 const denoise = $<HTMLInputElement>('denoise');
+const deband = $<HTMLInputElement>('deband');
 const showInfo = $<HTMLInputElement>('showInfo');
 const compare = $<HTMLInputElement>('compare');
 const videos = $<HTMLUListElement>('videos');
@@ -54,6 +55,7 @@ function render(): void {
   showSharpness();
   denoiseField.hidden = settings.sharpness === 0;
   denoise.checked = settings.denoise;
+  deband.checked = settings.deband;
   showInfo.checked = settings.showInfo;
   compare.checked = settings.compare;
 }
@@ -76,6 +78,7 @@ quality.addEventListener('change', () => save({ quality: quality.value as Qualit
 sharpness.addEventListener('input', showSharpness);
 sharpness.addEventListener('change', () => save({ sharpness: Number(sharpness.value) }));
 denoise.addEventListener('change', () => save({ denoise: denoise.checked }));
+deband.addEventListener('change', () => save({ deband: deband.checked }));
 showInfo.addEventListener('change', () => save({ showInfo: showInfo.checked }));
 compare.addEventListener('change', () => save({ compare: compare.checked }));
 

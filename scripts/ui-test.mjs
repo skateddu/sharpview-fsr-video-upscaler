@@ -60,6 +60,7 @@ function stub({ granted, stored, catalog, lang, formatSource }) {
         { name: 'toggle-quality', shortcut: 'Alt+Shift+G', description: 'Switch quality' },
         { name: 'toggle-info', shortcut: 'Ctrl+Alt+I', description: 'Info on the video' },
         { name: 'toggle-compare', shortcut: '', description: 'A/B comparison' },
+        { name: 'toggle-deband', shortcut: '', description: 'Deband' },
       ],
     },
   };
@@ -133,6 +134,8 @@ for (const scheme of ['light', 'dark']) {
 
   await page.click('#compare');
   expect('popup: A/B comparison saved', (await settingsOf(page)).compare === true);
+  await page.click('#deband');
+  expect('popup: deband saved', (await settingsOf(page)).deband === true);
 
   await page.click('#enabled');
   s = await settingsOf(page);
@@ -180,7 +183,7 @@ for (const scheme of ['light', 'dark']) {
 {
   const { page, context, errors } = await open('options.html', { viewport: { width: 900, height: 900 } });
   await page.waitForSelector('#shortcuts tr');
-  expect('options: shortcuts listed', (await page.locator('#shortcuts tr').count()) === 5);
+  expect('options: shortcuts listed', (await page.locator('#shortcuts tr').count()) === 6);
   expect('options: thresholds from the schema', (await page.locator('#minScale option').count()) === 4);
 
   await page.fill('#blockedSites', 'https://www.Example.com/video\nvimeo.com, not valid!\n\nvimeo.com');

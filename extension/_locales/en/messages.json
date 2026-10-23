@@ -9,6 +9,7 @@
   "cmdToggleQuality": { "message": "Switch FSR1 (EASU + RCAS) / Bicubic + RCAS" },
   "cmdToggleInfo": { "message": "Show/hide resolution and fps on the video" },
   "cmdToggleCompare": { "message": "A/B comparison: bilinear on the left, upscaler on the right" },
+  "cmdToggleDeband": { "message": "Deband on/off: smoother gradients on compressed video" },
 
   "qualityHigh": { "message": "FSR1 (EASU + RCAS)" },
   "qualityLight": { "message": "Bicubic + RCAS" },
@@ -28,6 +29,7 @@
   "popupSharpness": { "message": "Sharpness" },
   "popupSharpnessOff": { "message": "Off" },
   "popupDenoise": { "message": "Less sharpening on noise" },
+  "popupDeband": { "message": "Smoother gradients (deband)" },
   "popupShowInfo": { "message": "Info on the video" },
   "popupCompare": { "message": "A/B comparison" },
   "popupVideosInTab": { "message": "Videos in this tab" },
@@ -46,6 +48,7 @@
   },
   "labelReduced": { "message": "(reduced)" },
   "labelNoSharpening": { "message": "no sharpening" },
+  "labelDeband": { "message": "deband" },
   "labelSharpenOnly": { "message": "sharpening only" },
 
   "statusActive": { "message": "Active" },

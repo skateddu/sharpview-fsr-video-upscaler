@@ -80,6 +80,13 @@ test('normalizeSettings: sharpenNative is off when missing (saved by 1.0.0)', ()
   assert.equal(normalizeSettings({ ...saved, sharpenNative: 'yes' }).sharpenNative, false);
 });
 
+test('normalizeSettings: deband is off when missing (saved by 1.1.0)', () => {
+  const { deband, ...saved } = { ...DEFAULT_SETTINGS, deband: true };
+  assert.equal(normalizeSettings(saved).deband, false);
+  assert.equal(normalizeSettings({ ...saved, deband }).deband, true);
+  assert.equal(normalizeSettings({ ...saved, deband: 1 }).deband, false);
+});
+
 test('normalizeSettings: corrupted values → defaults or limits', () => {
   const s = normalizeSettings({
     version: 2,

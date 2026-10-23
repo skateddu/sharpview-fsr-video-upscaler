@@ -211,6 +211,14 @@ state = await debug();
 expect('sharpness 0% → active without RCAS', state.contain.active && state.contain.frames > framesSharp0, why(state.contain));
 await page.evaluate(() => window.__videoUpscaler.set({ sharpness: 87 }));
 
+// Deband: an extra pass before upscaling, rendering continues.
+await page.evaluate(() => window.__videoUpscaler.set({ deband: true }));
+const framesDeband = (await debug()).contain.frames;
+await page.waitForTimeout(600);
+state = await debug();
+expect('deband → active', state.contain.active && state.contain.frames > framesDeband, why(state.contain));
+await page.evaluate(() => window.__videoUpscaler.set({ deband: false }));
+
 // Turning off and on again from the settings.
 await page.evaluate(() => window.__videoUpscaler.set({ enabled: false }));
 const canvases = await page.evaluate(() => document.querySelectorAll('canvas[data-video-upscaler]').length);

@@ -9,6 +9,7 @@
   "cmdToggleQuality": { "message": "Basculer entre FSR1 (EASU + RCAS) et Bicubique + RCAS" },
   "cmdToggleInfo": { "message": "Afficher/masquer la résolution et les fps sur la vidéo" },
   "cmdToggleCompare": { "message": "Comparaison A/B : bilinéaire à gauche, upscaler à droite" },
+  "cmdToggleDeband": { "message": "Activer/désactiver le deband : dégradés plus doux sur les vidéos compressées" },
 
   "qualityHigh": { "message": "FSR1 (EASU + RCAS)" },
   "qualityLight": { "message": "Bicubique + RCAS" },
@@ -28,6 +29,7 @@
   "popupSharpness": { "message": "Netteté" },
   "popupSharpnessOff": { "message": "Désactivée" },
   "popupDenoise": { "message": "Moins de netteté sur le bruit" },
+  "popupDeband": { "message": "Dégradés plus doux (deband)" },
   "popupShowInfo": { "message": "Infos sur la vidéo" },
   "popupCompare": { "message": "Comparaison A/B" },
   "popupVideosInTab": { "message": "Vidéos dans cet onglet" },
@@ -46,6 +48,7 @@
   },
   "labelReduced": { "message": "(réduite)" },
   "labelNoSharpening": { "message": "sans netteté" },
+  "labelDeband": { "message": "deband" },
   "labelSharpenOnly": { "message": "netteté seule" },
 
   "statusActive": { "message": "Active" },

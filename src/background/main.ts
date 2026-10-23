@@ -42,6 +42,7 @@ const COMMANDS: Record<string, (s: Settings) => Partial<Settings>> = {
   'toggle-quality': (s) => ({ quality: QUALITIES[(QUALITIES.indexOf(s.quality) + 1) % QUALITIES.length], enabled: true }),
   'toggle-info': (s) => ({ showInfo: !s.showInfo }),
   'toggle-compare': (s) => ({ compare: !s.compare }),
+  'toggle-deband': (s) => ({ deband: !s.deband }),
 };
 
 browser.commands.onCommand.addListener((command) => {

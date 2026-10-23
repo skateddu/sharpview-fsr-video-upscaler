@@ -8,7 +8,7 @@ uniform vec2 u_inSize;    // source size in pixels
 
 vec3 fetch(ivec2 p) {
   p = clamp(p, ivec2(0), ivec2(u_inSize) - 1);
-  return clamp(texelFetch(u_src, p, 0).rgb, 0.0, 1.0);
+  return clamp(texelFetch(u_in, p, 0).rgb, 0.0, 1.0);
 }
 
 // Replaces the APrxLoRcp approximations; the max avoids 0 * inf = NaN on flat areas.
@@ -127,5 +127,5 @@ void main() {
   // Deringing: clamp to the range of the 4 nearest texels.
   vec3 mn = min(min(fC, gC), min(jC, kC));
   vec3 mx = max(max(fC, gC), max(jC, kC));
-  fragColor = vec4(clamp(aC / aW, mn, mx), 1.0);
+  fragColor = vec4(dither(clamp(aC / aW, mn, mx)), 1.0);
 }

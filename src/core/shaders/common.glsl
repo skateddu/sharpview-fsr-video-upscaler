@@ -3,7 +3,9 @@
 uniform vec2 u_outSize;    // render target size in pixels
 uniform bool u_flipY;      // true when drawing to the canvas (origin at the bottom left)
 uniform sampler2D u_src;   // source frame (LINEAR filtering for bilinear; texelFetch ignores it)
+uniform sampler2D u_in;    // upscaling input: the source frame, or the debanded one
 uniform float u_split;     // output x left of which plain bilinear is shown; < 0 disables
+uniform bool u_dither;     // last pass of a debanded frame: dither to the 8-bit output
 
 out vec4 fragColor;
 
@@ -17,6 +19,14 @@ vec2 outPos() {
 // Approximate luma used by FSR1 (range 0..2).
 float luma(vec3 c) {
   return c.b * 0.5 + (c.r * 0.5 + c.g);
+}
+
+// Up to half a level of noise before the 8-bit output, so gradients rebuilt by the deband do
+// not turn back into steps (interleaved gradient noise: no visible pattern).
+vec3 dither(vec3 c) {
+  if (!u_dither) return c;
+  float n = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+  return c + (n - 0.5) / 255.0;
 }
 
 // If the pixel falls in the comparison area, writes its color and returns true.

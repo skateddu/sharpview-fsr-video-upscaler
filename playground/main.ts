@@ -27,6 +27,7 @@ const outputSel = $<HTMLSelectElement>('output');
 const sharpness = $<HTMLInputElement>('sharpness');
 const sharpnessVal = $<HTMLOutputElement>('sharpness-val');
 const denoise = $<HTMLInputElement>('denoise');
+const deband = $<HTMLInputElement>('deband');
 const viewSel = $<HTMLSelectElement>('view');
 const compare = $<HTMLInputElement>('compare');
 const split = $<HTMLInputElement>('split');
@@ -64,6 +65,7 @@ function readControls(): void {
   opts.mode = modeSel.value as UpscaleMode;
   opts.sharpness = Number(sharpness.value);
   opts.denoise = denoise.checked;
+  opts.deband = deband.checked;
   opts.split = compare.checked ? Number(split.value) : -1;
   sharpnessVal.textContent = opts.sharpness > 0 ? `${sharpness.value}%` : 'off';
   viewport.classList.toggle('native', viewSel.value === 'native');
@@ -191,7 +193,7 @@ seek.addEventListener('input', () => {
   if (video.duration) video.currentTime = (Number(seek.value) / 1000) * video.duration;
 });
 
-for (const el of [modeSel, outputSel, sharpness, denoise, viewSel, compare, split, zoomSel]) {
+for (const el of [modeSel, outputSel, sharpness, denoise, deband, viewSel, compare, split, zoomSel]) {
   el.addEventListener('input', () => {
     readControls();
     requestDraw();
@@ -214,6 +216,8 @@ document.addEventListener('keydown', (e) => {
   const n = Number(e.key);
   if (n >= 1 && n <= UPSCALE_MODES.length) {
     modeSel.value = UPSCALE_MODES[n - 1];
+  } else if (e.key === 'd' || e.key === 'D') {
+    deband.checked = !deband.checked;
   } else if (e.key === 'c' || e.key === 'C') {
     compare.checked = !compare.checked;
   } else if (e.key === 'n' || e.key === 'N') {
@@ -294,6 +298,7 @@ try {
 const params = new URLSearchParams(location.search);
 if (params.has('mode')) modeSel.value = params.get('mode')!;
 if (params.has('out')) outputSel.value = params.get('out')!;
+if (params.has('deband')) deband.checked = true;
 if (params.has('split')) {
   compare.checked = true;
   split.value = params.get('split')!;

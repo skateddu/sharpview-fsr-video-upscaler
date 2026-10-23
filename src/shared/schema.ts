@@ -15,6 +15,8 @@ export interface Settings {
   /** RCAS sharpening in %: 100 = maximum, 0 = off. */
   sharpness: number;
   denoise: boolean;
+  /** Smooths banding on gradients (compressed video) before upscaling. */
+  deband: boolean;
   /** Label with resolution and fps on top of the video. */
   showInfo: boolean;
   /** A/B comparison: left half with plain bilinear. */
@@ -34,6 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   quality: 'high',
   sharpness: DEFAULT_SHARPNESS,
   denoise: true,
+  deband: false,
   showInfo: false,
   compare: false,
   minScale: 1.05,
@@ -73,6 +76,7 @@ export function normalizeSettings(raw: unknown): Settings {
     quality: QUALITIES.includes(r.quality as Quality) ? (r.quality as Quality) : d.quality,
     sharpness: Math.round(num('sharpness', 0, 100)),
     denoise: bool('denoise'),
+    deband: bool('deband'),
     showInfo: bool('showInfo'),
     compare: bool('compare'),
     minScale: num('minScale', 1, 4),

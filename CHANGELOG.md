@@ -7,6 +7,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Deband** (off by default): a checkbox in the popup and a shortcut to assign in Firefox.
+  Before upscaling, a pass at the source resolution blends the flat steps that compression
+  leaves on gradients, while edges and fine detail stay as they are (same approach as mpv's
+  deband). Intermediate textures switch to half float and the output is dithered, so the
+  rebuilt gradients do not turn back into steps; about 0.03–0.15 ms more per 4K frame on an
+  RTX 5070 Ti
+
 ### Changed
 
 - **Light quality is now Bicubic + RCAS** instead of Bilinear + RCAS: sharper, closer to FSR1

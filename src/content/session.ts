@@ -315,6 +315,7 @@ export class VideoSession {
       layout.sharpenOnly ? t('labelSharpenOnly') : t(QUALITY_KEYS[this.effectiveQuality()].short),
       this.reduced && !layout.sharpenOnly ? t('labelReduced') : '',
       s.sharpness ? '' : t('labelNoSharpening'),
+      s.deband ? t('labelDeband') : '',
       s.compare ? 'A/B' : '',
     ].filter(Boolean);
     return (

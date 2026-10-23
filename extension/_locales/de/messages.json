@@ -9,6 +9,7 @@
   "cmdToggleQuality": { "message": "Zwischen FSR1 (EASU + RCAS) und Bikubisch + RCAS wechseln" },
   "cmdToggleInfo": { "message": "Auflösung und fps im Video ein-/ausblenden" },
   "cmdToggleCompare": { "message": "A/B-Vergleich: links bilinear, rechts Upscaler" },
+  "cmdToggleDeband": { "message": "Deband an/aus: weichere Farbverläufe bei komprimierten Videos" },
 
   "qualityHigh": { "message": "FSR1 (EASU + RCAS)" },
   "qualityLight": { "message": "Bikubisch + RCAS" },
@@ -28,6 +29,7 @@
   "popupSharpness": { "message": "Schärfe" },
   "popupSharpnessOff": { "message": "Aus" },
   "popupDenoise": { "message": "Weniger Schärfung bei Rauschen" },
+  "popupDeband": { "message": "Weichere Farbverläufe (Deband)" },
   "popupShowInfo": { "message": "Infos im Video" },
   "popupCompare": { "message": "A/B-Vergleich" },
   "popupVideosInTab": { "message": "Videos in diesem Tab" },
@@ -46,6 +48,7 @@
   },
   "labelReduced": { "message": "(reduziert)" },
   "labelNoSharpening": { "message": "ohne Schärfung" },
+  "labelDeband": { "message": "Deband" },
   "labelSharpenOnly": { "message": "nur Schärfung" },
 
   "statusActive": { "message": "Aktiv" },

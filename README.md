@@ -18,6 +18,8 @@ recent NVIDIA, AMD and Intel ones.
   Dailymotion, embedded players, videos in iframes and shadow DOM
 - **Two qualities**: FSR1 (EASU + RCAS) and a lighter Bicubic + RCAS for weak GPUs, with
   adjustable sharpness (0% turns sharpening off)
+- **Deband** (optional): smooths the steps that compression leaves on skies, fog and dark
+  gradients, before upscaling; real edges and fine detail stay as they are
 - **Automatic fallbacks**: the original video stays visible when upscaling is not needed, for
   DRM-protected or cross-origin videos, and when the GPU cannot keep up (after first trying the
   lighter qualities)
@@ -56,9 +58,9 @@ Load Temporary Add-on (`npm run package` builds the same zip in `web-ext-artifac
 
 Upscaling starts automatically on every video shown larger than its resolution, e.g. a 480p or
 720p video in theater mode or fullscreen. Clicking the toolbar icon opens the popup: master and
-per-site switches, quality, sharpness, A/B comparison and the state of the tab's videos. The
-badge shows **ON** when active and **OFF** on excluded sites. The options page sets excluded or
-allowed sites, the activation threshold and sharpening for videos that are not enlarged.
+per-site switches, quality, sharpness, deband, A/B comparison and the state of the tab's videos.
+The badge shows **ON** when active and **OFF** on excluded sites. The options page sets excluded
+or allowed sites, the activation threshold and sharpening for videos that are not enlarged.
 
 | Shortcut | Action |
 | --- | --- |
@@ -66,6 +68,7 @@ allowed sites, the activation threshold and sharpening for videos that are not e
 | `Alt+Shift+G` | Switch FSR1 (EASU + RCAS) / Bicubic + RCAS |
 | `Alt+Shift+I` | Show resolution and fps on the video |
 | `Alt+Shift+O` | A/B comparison: bilinear on the left, upscaler on the right |
+| (unassigned) | Deband on/off |
 
 Shortcuts can be changed in `about:addons` → gear icon → Manage Extension Shortcuts.
 
@@ -88,7 +91,7 @@ content script (one per frame)
     layout          eligibility and geometry (pure)
     overlay         canvas and info label laid over the video
     perf            frame rate, slow-GPU detection, WebGL context budget (pure)
-    core/Upscaler   WebGL2: upload → EASU, bicubic or bilinear → RCAS → canvas
+    core/Upscaler   WebGL2: upload → [deband] → EASU, bicubic or bilinear → RCAS → canvas
     core/FrameLoop  one callback per new video frame
 background          per-tab badge, keyboard shortcuts
 popup / options     switches, quality, sharpness, per-site rules
@@ -169,7 +172,7 @@ npm run package    # Release build (no logs or sourcemaps), lint and zip into we
 eye).
 
 The playground opens a local video (button or drag and drop) or a test pattern. Keys: space
-play/pause, `1`–`6` mode, `C` bilinear/upscaler split (drag on the video to move it), `N`
+play/pause, `1`–`6` mode, `D` deband, `C` bilinear/upscaler split (drag on the video to move it), `N`
 compare with the browser's native scaling. "Benchmark" measures the cost per frame of every
 mode.
 

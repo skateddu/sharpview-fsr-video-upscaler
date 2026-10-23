@@ -4,6 +4,7 @@ import bilinearSrc from './shaders/bilinear.frag.glsl';
 import easuSrc from './shaders/easu.frag.glsl';
 import bicubicSrc from './shaders/bicubic.frag.glsl';
 import rcasSrc from './shaders/rcas.frag.glsl';
+import debandSrc from './shaders/deband.frag.glsl';
 
 import { DEFAULT_SHARPNESS, MODE_PASSES, type UpscaleMode } from './modes';
 
@@ -13,6 +14,8 @@ export interface RenderOptions {
   sharpness: number;
   /** Reduces sharpening where RCAS detects noise. */
   denoise: boolean;
+  /** Smooths banding (steps on gradients from compression) before upscaling. */
+  deband: boolean;
   /** Fraction (0..1) of the width shown with plain bilinear on the left, for comparison. < 0 disables. */
   split: number;
 }
@@ -21,6 +24,7 @@ export const DEFAULT_OPTIONS: RenderOptions = {
   mode: 'fsr',
   sharpness: DEFAULT_SHARPNESS,
   denoise: true,
+  deband: false,
   split: -1,
 };
 
@@ -30,8 +34,8 @@ precision highp int;
 precision highp sampler2D;
 `;
 
-/** Uniforms set on every pass; the samplers (u_src, u_tex) are bound once per program. */
-const UNIFORMS = ['u_outSize', 'u_flipY', 'u_split', 'u_inSize', 'u_sharpness', 'u_denoise'] as const;
+/** Uniforms set on every pass; the samplers (u_src, u_tex, u_in) are bound once per program. */
+const UNIFORMS = ['u_outSize', 'u_flipY', 'u_split', 'u_inSize', 'u_sharpness', 'u_denoise', 'u_dither'] as const;
 
 type UniformName = (typeof UNIFORMS)[number];
 
@@ -40,10 +44,12 @@ interface Program {
   loc: Record<UniformName, WebGLUniformLocation | null>;
 }
 
-type ProgramName = 'bilinear' | 'bicubic' | 'easu' | 'rcas';
+type ProgramName = 'bilinear' | 'bicubic' | 'easu' | 'rcas' | 'deband';
 
 const SRC_UNIT = 0;
 const MID_UNIT = 1;
+/** Upscaling input: the source texture, or the debanded one. */
+const IN_UNIT = 2;
 
 /**
  * FSR1 upscaler on WebGL2, with lighter bicubic and bilinear pipelines. Draws `source` onto
@@ -61,10 +67,17 @@ export class Upscaler {
   private srcTex!: WebGLTexture;
   private midTex!: WebGLTexture;
   private midFbo!: WebGLFramebuffer;
+  private debTex!: WebGLTexture;
+  private debFbo!: WebGLFramebuffer;
+  /** Half-float render targets (EXT_color_buffer_float): debanded gradients keep in-between values. */
+  private floatTargets = false;
   private srcW = 0;
   private srcH = 0;
   private midW = 0;
   private midH = 0;
+  private midFloat = false;
+  private debW = 0;
+  private debH = 0;
 
   constructor(readonly canvas: HTMLCanvasElement) {
     const gl = canvas.getContext('webgl2', {
@@ -103,13 +116,22 @@ export class Upscaler {
     this.upload(source, srcW, srcH);
     gl.bindVertexArray(this.vao);
 
+    let input = this.srcTex;
+    if (opts.deband) {
+      this.ensureDeband(srcW, srcH);
+      this.bindInput(this.srcTex);
+      this.pass('deband', this.debFbo, srcW, srcH, -1, opts);
+      input = this.debTex;
+    }
+    this.bindInput(input);
+
     const { upscale, rcas } = MODE_PASSES[opts.mode];
     // RCAS is skipped for the modes without it and at zero sharpening (it would change nothing).
     if (!rcas || opts.sharpness <= 0) {
       this.pass(upscale, null, outW, outH, split, opts);
       return;
     }
-    this.ensureMid(outW, outH);
+    this.ensureMid(outW, outH, opts.deband && this.floatTargets);
     this.pass(upscale, this.midFbo, outW, outH, -1, opts);
     this.pass('rcas', null, outW, outH, split, opts);
   }
@@ -144,12 +166,17 @@ export class Upscaler {
       bicubic: this.link(bicubicSrc),
       easu: this.link(easuSrc),
       rcas: this.link(rcasSrc),
+      deband: this.link(debandSrc),
     };
     this.vao = gl.createVertexArray()!;
     this.srcTex = this.createTexture(gl.LINEAR);
     this.midTex = this.createTexture(gl.NEAREST);
     this.midFbo = gl.createFramebuffer()!;
-    this.srcW = this.srcH = this.midW = this.midH = 0;
+    this.debTex = this.createTexture(gl.LINEAR);
+    this.debFbo = gl.createFramebuffer()!;
+    // Extensions must be enabled again after a context loss.
+    this.floatTargets = gl.getExtension('EXT_color_buffer_float') !== null;
+    this.srcW = this.srcH = this.midW = this.midH = this.debW = this.debH = 0;
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
   }
@@ -167,16 +194,42 @@ export class Upscaler {
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, gl.RGBA, gl.UNSIGNED_BYTE, source);
   }
 
-  private ensureMid(w: number, h: number): void {
-    if (w === this.midW && h === this.midH) return;
-    const gl = this.gl;
-    gl.activeTexture(gl.TEXTURE0 + MID_UNIT);
-    gl.bindTexture(gl.TEXTURE_2D, this.midTex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.midFbo);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.midTex, 0);
+  private ensureMid(w: number, h: number, float: boolean): void {
+    if (w === this.midW && h === this.midH && float === this.midFloat) return;
+    this.allocTarget(this.midTex, this.midFbo, MID_UNIT, w, h, float);
     this.midW = w;
     this.midH = h;
+    this.midFloat = float;
+  }
+
+  private ensureDeband(w: number, h: number): void {
+    if (w === this.debW && h === this.debH) return;
+    this.allocTarget(this.debTex, this.debFbo, IN_UNIT, w, h, this.floatTargets);
+    this.debW = w;
+    this.debH = h;
+  }
+
+  private allocTarget(
+    tex: WebGLTexture,
+    fbo: WebGLFramebuffer,
+    unit: number,
+    w: number,
+    h: number,
+    float: boolean,
+  ): void {
+    const gl = this.gl;
+    gl.activeTexture(gl.TEXTURE0 + unit);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
+    if (float) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+    else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+  }
+
+  private bindInput(tex: WebGLTexture): void {
+    const gl = this.gl;
+    gl.activeTexture(gl.TEXTURE0 + IN_UNIT);
+    gl.bindTexture(gl.TEXTURE_2D, tex);
   }
 
   private pass(
@@ -198,6 +251,7 @@ export class Upscaler {
     gl.uniform2f(loc.u_inSize, this.srcW, this.srcH);
     gl.uniform1f(loc.u_sharpness, Math.min(1, Math.max(0, opts.sharpness / 100)));
     gl.uniform1i(loc.u_denoise, opts.denoise ? 1 : 0);
+    gl.uniform1i(loc.u_dither, opts.deband && target === null ? 1 : 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
 
@@ -227,6 +281,7 @@ export class Upscaler {
     gl.useProgram(program);
     gl.uniform1i(gl.getUniformLocation(program, 'u_src'), SRC_UNIT);
     gl.uniform1i(gl.getUniformLocation(program, 'u_tex'), MID_UNIT);
+    gl.uniform1i(gl.getUniformLocation(program, 'u_in'), IN_UNIT);
     return { program, loc };
   }
 

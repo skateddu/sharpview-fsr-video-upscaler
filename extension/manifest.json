@@ -67,6 +67,9 @@
         "default": "Alt+Shift+O"
       },
       "description": "__MSG_cmdToggleCompare__"
+    },
+    "toggle-deband": {
+      "description": "__MSG_cmdToggleDeband__"
     }
   },
   "browser_specific_settings": {

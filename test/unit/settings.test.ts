@@ -59,12 +59,15 @@ test('toRenderOptions: quality, sharpness and comparison', () => {
     mode: 'bicubic-rcas',
     sharpness: 50,
     denoise: true,
+    deband: false,
     split: 0.5,
   });
   assert.equal(toRenderOptions(DEFAULT_SETTINGS).mode, 'fsr');
   // Effective quality lower than the chosen one (slow GPU).
   assert.equal(toRenderOptions(DEFAULT_SETTINGS, 'light').mode, 'bicubic-rcas');
   assert.equal(toRenderOptions(DEFAULT_SETTINGS, 'minimal').mode, 'bilinear-rcas');
+  assert.equal(toRenderOptions(DEFAULT_SETTINGS).deband, false);
+  assert.equal(toRenderOptions({ ...DEFAULT_SETTINGS, deband: true }, 'minimal').deband, true);
 });
 
 test('lowerQuality: high → light → minimal → native', () => {

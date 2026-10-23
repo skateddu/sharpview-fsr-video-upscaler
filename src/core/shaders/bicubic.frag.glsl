@@ -21,15 +21,15 @@ void main() {
   vec2 t3 = (t1 + 2.0) / u_inSize;
 
   vec3 c =
-      (texture(u_src, vec2(t0.x, t0.y)).rgb * w0.x +
-       texture(u_src, vec2(t12.x, t0.y)).rgb * w12.x +
-       texture(u_src, vec2(t3.x, t0.y)).rgb * w3.x) * w0.y +
-      (texture(u_src, vec2(t0.x, t12.y)).rgb * w0.x +
-       texture(u_src, vec2(t12.x, t12.y)).rgb * w12.x +
-       texture(u_src, vec2(t3.x, t12.y)).rgb * w3.x) * w12.y +
-      (texture(u_src, vec2(t0.x, t3.y)).rgb * w0.x +
-       texture(u_src, vec2(t12.x, t3.y)).rgb * w12.x +
-       texture(u_src, vec2(t3.x, t3.y)).rgb * w3.x) * w3.y;
+      (texture(u_in, vec2(t0.x, t0.y)).rgb * w0.x +
+       texture(u_in, vec2(t12.x, t0.y)).rgb * w12.x +
+       texture(u_in, vec2(t3.x, t0.y)).rgb * w3.x) * w0.y +
+      (texture(u_in, vec2(t0.x, t12.y)).rgb * w0.x +
+       texture(u_in, vec2(t12.x, t12.y)).rgb * w12.x +
+       texture(u_in, vec2(t3.x, t12.y)).rgb * w3.x) * w12.y +
+      (texture(u_in, vec2(t0.x, t3.y)).rgb * w0.x +
+       texture(u_in, vec2(t12.x, t3.y)).rgb * w12.x +
+       texture(u_in, vec2(t3.x, t3.y)).rgb * w3.x) * w3.y;
   // Catmull-Rom overshoots near edges: keep the result displayable.
-  fragColor = vec4(clamp(c, 0.0, 1.0), 1.0);
+  fragColor = vec4(dither(clamp(c, 0.0, 1.0)), 1.0);
 }

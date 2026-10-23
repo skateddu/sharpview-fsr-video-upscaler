@@ -49,5 +49,5 @@ void main() {
   }
 
   vec3 c = (lobe * (b + d + f + h) + e) / (4.0 * lobe + 1.0);
-  fragColor = vec4(c, 1.0);
+  fragColor = vec4(dither(c), 1.0);
 }

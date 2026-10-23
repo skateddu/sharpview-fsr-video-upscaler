@@ -1,7 +1,8 @@
 /*
- * Renderer regression test: renders the playground's test pattern in every mode at ×3 and
- * compares it with test/golden, also after a WebGL context loss. The references depend a
- * little on fonts and GPU: on another machine regenerate them and check them by eye.
+ * Renderer regression test: renders the playground's test pattern in every mode at ×3 (and
+ * FSR1 with deband) and compares it with test/golden, also after a WebGL context loss. The
+ * references depend a little on fonts and GPU: on another machine regenerate them and check
+ * them by eye.
  * Usage: npm run build && node scripts/render-test.mjs [--update-golden]
  */
 import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
@@ -95,6 +96,11 @@ for (const mode of UPSCALE_MODES) {
   await check(mode, await snapshot());
 }
 
+// Deband before FSR1: half-float intermediate textures and dithered output.
+await page.goto(`${base}?pattern&mode=fsr&out=x3&deband`);
+await page.waitForFunction(() => document.body.dataset.status !== undefined, null, { timeout: 10000 });
+await check('fsr-deband', await snapshot());
+
 // Context loss and restore: rendering must resume identically.
 await page.goto(`${base}?pattern&mode=fsr&out=x3`);
 await page.waitForFunction(() => document.body.dataset.status === 'ok');
@@ -135,7 +141,7 @@ const firstFrame = await page.evaluate(async () => {
   await new Promise((r) => video.addEventListener('loadedmetadata', r, { once: true }));
   const { Upscaler } = window.__playground;
   const upscaler = new Upscaler(Object.assign(document.createElement('canvas'), { width: 64, height: 64 }));
-  const opts = { mode: 'bilinear', sharpness: 0, denoise: false, split: -1 };
+  const opts = { mode: 'bilinear', sharpness: 0, denoise: false, deband: false, split: -1 };
   const readyState = video.readyState;
   upscaler.render(video, video.videoWidth, video.videoHeight, opts);
   await video.play();
