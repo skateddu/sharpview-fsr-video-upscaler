@@ -6,14 +6,16 @@
 
   "cmdOpenPopup": { "message": "Abrir el panel" },
   "cmdToggle": { "message": "Activar/desactivar el escalado" },
-  "cmdToggleQuality": { "message": "Alternar FSR1 (EASU + RCAS) / Bilineal + RCAS" },
+  "cmdToggleQuality": { "message": "Alternar FSR1 (EASU + RCAS) / Bicúbico + RCAS" },
   "cmdToggleInfo": { "message": "Mostrar/ocultar resolución y fps en el vídeo" },
   "cmdToggleCompare": { "message": "Comparación A/B: bilineal a la izquierda, escalador a la derecha" },
 
   "qualityHigh": { "message": "FSR1 (EASU + RCAS)" },
-  "qualityLight": { "message": "Bilineal + RCAS" },
+  "qualityLight": { "message": "Bicúbico + RCAS" },
   "qualityHighShort": { "message": "FSR1" },
-  "qualityLightShort": { "message": "bilineal+RCAS" },
+  "qualityLightShort": { "message": "bicúbico+RCAS" },
+  "qualityMinimal": { "message": "Bilineal + RCAS" },
+  "qualityMinimalShort": { "message": "bilineal+RCAS" },
 
   "popupMasterSwitch": { "message": "Activar el escalado" },
   "popupNeedsAccess": { "message": "Se necesita acceso a los sitios para encontrar los vídeos." },

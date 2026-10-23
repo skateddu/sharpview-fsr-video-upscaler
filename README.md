@@ -16,11 +16,11 @@ recent NVIDIA, AMD and Intel ones.
 
 - **FSR1 upscaling** on every video shown larger than its resolution: YouTube, Twitch,
   Dailymotion, embedded players, videos in iframes and shadow DOM
-- **Two qualities**: FSR1 (EASU + RCAS) and a lighter Bilinear + RCAS for weak GPUs, with
+- **Two qualities**: FSR1 (EASU + RCAS) and a lighter Bicubic + RCAS for weak GPUs, with
   adjustable sharpness (0% turns sharpening off)
 - **Automatic fallbacks**: the original video stays visible when upscaling is not needed, for
   DRM-protected or cross-origin videos, and when the GPU cannot keep up (after first trying the
-  lighter quality)
+  lighter qualities)
 - **Frame-accurate**: renders every video frame, also at 60 fps, and pauses for videos that are
   off screen or paused
 - **Sharpening at native size** (optional): videos that are not enlarged get RCAS sharpening
@@ -63,7 +63,7 @@ allowed sites, the activation threshold and sharpening for videos that are not e
 | Shortcut | Action |
 | --- | --- |
 | `Alt+Shift+U` | Turn upscaling on/off |
-| `Alt+Shift+G` | Switch FSR1 (EASU + RCAS) / Bilinear + RCAS |
+| `Alt+Shift+G` | Switch FSR1 (EASU + RCAS) / Bicubic + RCAS |
 | `Alt+Shift+I` | Show resolution and fps on the video |
 | `Alt+Shift+O` | A/B comparison: bilinear on the left, upscaler on the right |
 
@@ -88,7 +88,7 @@ content script (one per frame)
     layout          eligibility and geometry (pure)
     overlay         canvas and info label laid over the video
     perf            frame rate, slow-GPU detection, WebGL context budget (pure)
-    core/Upscaler   WebGL2: upload → EASU or bilinear → RCAS → canvas
+    core/Upscaler   WebGL2: upload → EASU, bicubic or bilinear → RCAS → canvas
     core/FrameLoop  one callback per new video frame
 background          per-tab badge, keyboard shortcuts
 popup / options     switches, quality, sharpness, per-site rules
@@ -112,8 +112,9 @@ popup / options     switches, quality, sharpness, per-site rules
 - **Performance.** Per-frame work happens only while upscaling; native videos are re-evaluated
   on events and once per second. After the first scan only added DOM nodes are examined, which
   matters on pages with live chat. If rendering falls behind the video **and** the measured GPU
-  cost per frame is high for 3 seconds, quality drops to Bilinear + RCAS, then to the native
-  video. Off-screen videos release their WebGL context; at most 12 contexts per frame are used.
+  cost per frame is high for 3 seconds, quality drops one step at a time: Bicubic + RCAS,
+  Bilinear + RCAS, then the native video. Off-screen videos release their WebGL context; at most
+  12 contexts per frame are used.
 - **Settings** live in `storage.sync` with a versioned schema and queued writes, so rapid
   shortcuts never lose a change. **Logs** appear only in development builds.
 
@@ -168,7 +169,7 @@ npm run package    # Release build (no logs or sourcemaps), lint and zip into we
 eye).
 
 The playground opens a local video (button or drag and drop) or a test pattern. Keys: space
-play/pause, `1`–`4` mode, `C` bilinear/upscaler split (drag on the video to move it), `N`
+play/pause, `1`–`6` mode, `C` bilinear/upscaler split (drag on the video to move it), `N`
 compare with the browser's native scaling. "Benchmark" measures the cost per frame of every
 mode.
 

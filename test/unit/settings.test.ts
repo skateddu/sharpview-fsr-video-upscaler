@@ -21,6 +21,7 @@ const tick = () => new Promise((r) => setTimeout(r, Math.random() * 3));
 };
 
 const { updateSettings, saveSettings, loadSettings, toRenderOptions, DEFAULT_SETTINGS } = await import('../../src/shared/settings.ts');
+const { lowerQuality } = await import('../../src/core/modes.ts');
 
 beforeEach(() => {
   sync = {};
@@ -55,12 +56,19 @@ test('updateSettings: an error does not block the queue', async () => {
 
 test('toRenderOptions: quality, sharpness and comparison', () => {
   assert.deepEqual(toRenderOptions({ ...DEFAULT_SETTINGS, quality: 'light', sharpness: 50, compare: true }), {
-    mode: 'bilinear-rcas',
+    mode: 'bicubic-rcas',
     sharpness: 50,
     denoise: true,
     split: 0.5,
   });
   assert.equal(toRenderOptions(DEFAULT_SETTINGS).mode, 'fsr');
   // Effective quality lower than the chosen one (slow GPU).
-  assert.equal(toRenderOptions(DEFAULT_SETTINGS, 'light').mode, 'bilinear-rcas');
+  assert.equal(toRenderOptions(DEFAULT_SETTINGS, 'light').mode, 'bicubic-rcas');
+  assert.equal(toRenderOptions(DEFAULT_SETTINGS, 'minimal').mode, 'bilinear-rcas');
+});
+
+test('lowerQuality: high → light → minimal → native', () => {
+  assert.equal(lowerQuality('high'), 'light');
+  assert.equal(lowerQuality('light'), 'minimal');
+  assert.equal(lowerQuality('minimal'), null);
 });

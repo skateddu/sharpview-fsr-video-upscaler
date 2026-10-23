@@ -47,6 +47,7 @@ function stub({ granted, stored, catalog, lang, formatSource }) {
           video({ active: true, code: 'active', input: '854×480', output: '2560×1440', fps: 60, videoFps: 60, costMs: 1.8 }),
           video({ active: true, code: 'active', sharpenOnly: true, input: '1920×1080', output: '1920×1080', fps: 30, videoFps: 30, costMs: 0.6 }),
           video({ active: false, code: 'not-needed', detail: '0.62', input: '1280×720', output: '0×0', fps: 0, videoFps: 30 }),
+          video({ active: true, code: 'active', quality: 'minimal', degraded: true, input: '640×360', output: '3840×2160', fps: 60, videoFps: 60, costMs: 7.2 }),
         ],
       }),
       create: async ({ url }) => window.__stub.opened.push(url),
@@ -98,10 +99,11 @@ for (const scheme of ['light', 'dark']) {
   const { page, context, errors } = await open('popup.html');
   await page.waitForSelector('#videos .dot');
   expect('popup: tab site', (await page.textContent('#site')).startsWith('youtube.com'));
-  expect('popup: video states', (await page.locator('#videos li').count()) === 3);
+  expect('popup: video states', (await page.locator('#videos li').count()) === 4);
   expect('popup: active video described', (await page.textContent('#videos')).includes('854×480 → 2560×1440 · 60 fps · 1.8 ms'));
   expect('popup: sharpening only described', (await page.textContent('#videos')).includes('Sharpening only (RCAS)'));
   expect('popup: native video explained', (await page.textContent('#videos')).includes('(×0.62)'));
+  expect('popup: reduced quality described', (await page.textContent('#videos')).includes('Bilinear + RCAS · reduced: slow GPU'));
 
   await page.click('#site-enabled');
   let s = await settingsOf(page);
@@ -160,7 +162,7 @@ for (const scheme of ['light', 'dark']) {
   await page.screenshot({ path: join(OUT, 'popup-it.png'), fullPage: true });
   const text = await page.textContent('body');
   expect('popup (it): static texts', text.includes('Qualità') && text.includes('Video in questa scheda') && text.includes('Altre impostazioni'));
-  expect('popup (it): dynamic texts', text.includes('Bilineare + RCAS') && text.includes('Non serve') && text.includes('nativo'));
+  expect('popup (it): dynamic texts', text.includes('Bicubico + RCAS') && text.includes('Non serve') && text.includes('nativo'));
   expect('popup (it): page language', (await page.getAttribute('html', 'lang')) === 'it');
   expect('popup (it): no English left', !/Quality|Sharpness|More settings|Videos in this tab/.test(text), text.slice(0, 120));
   expect('popup (it): no errors', errors.length === 0, errors.join(' | '));

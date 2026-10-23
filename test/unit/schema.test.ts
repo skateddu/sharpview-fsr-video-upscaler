@@ -92,6 +92,8 @@ test('normalizeSettings: corrupted values → defaults or limits', () => {
   });
   assert.equal(s.enabled, true);
   assert.equal(s.quality, 'high');
+  // Fallback step only, never a stored choice.
+  assert.equal(normalizeSettings({ version: 2, quality: 'minimal' }).quality, 'high');
   assert.equal(s.sharpness, 100);
   assert.equal(s.minScale, 1);
   assert.equal(s.siteMode, 'all');

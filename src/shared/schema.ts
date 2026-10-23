@@ -47,6 +47,7 @@ export const DEFAULT_SETTINGS: Settings = {
 export const QUALITY_KEYS: Record<Quality, { label: string; short: string }> = {
   high: { label: 'qualityHigh', short: 'qualityHighShort' },
   light: { label: 'qualityLight', short: 'qualityLightShort' },
+  minimal: { label: 'qualityMinimal', short: 'qualityMinimalShort' },
 };
 
 /** Activation thresholds offered in the options (labels are i18n keys). */

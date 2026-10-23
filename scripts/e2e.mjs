@@ -183,12 +183,15 @@ await page.evaluate(() => {
   return document.getElementById('contain').play();
 });
 
-// Slow GPU: first a lighter algorithm, then the native video; changing quality tries again.
-await page.evaluate(() => window.__videoUpscaler.degrade());
-await page.waitForTimeout(200);
-state = await debug();
-expect('slow GPU → reduced to light quality', state.contain.active && state.contain.degraded && state.contain.quality === 'light',
-  `${state.contain.quality}, ${why(state.contain)}`);
+// Slow GPU: lighter algorithms one step at a time, then the native video; changing quality tries again.
+for (const quality of ['light', 'minimal']) {
+  await page.evaluate(() => window.__videoUpscaler.degrade());
+  await page.waitForTimeout(200);
+  state = await debug();
+  expect(`slow GPU → reduced to ${quality} quality`,
+    state.contain.active && state.contain.degraded && state.contain.quality === quality,
+    `${state.contain.quality}, ${why(state.contain)}`);
+}
 await page.evaluate(() => window.__videoUpscaler.degrade());
 await page.waitForTimeout(200);
 state = await debug();

@@ -6,14 +6,16 @@
 
   "cmdOpenPopup": { "message": "Popup öffnen" },
   "cmdToggle": { "message": "Upscaling ein-/ausschalten" },
-  "cmdToggleQuality": { "message": "Zwischen FSR1 (EASU + RCAS) und Bilinear + RCAS wechseln" },
+  "cmdToggleQuality": { "message": "Zwischen FSR1 (EASU + RCAS) und Bikubisch + RCAS wechseln" },
   "cmdToggleInfo": { "message": "Auflösung und fps im Video ein-/ausblenden" },
   "cmdToggleCompare": { "message": "A/B-Vergleich: links bilinear, rechts Upscaler" },
 
   "qualityHigh": { "message": "FSR1 (EASU + RCAS)" },
-  "qualityLight": { "message": "Bilinear + RCAS" },
+  "qualityLight": { "message": "Bikubisch + RCAS" },
   "qualityHighShort": { "message": "FSR1" },
-  "qualityLightShort": { "message": "bilinear+RCAS" },
+  "qualityLightShort": { "message": "bikubisch+RCAS" },
+  "qualityMinimal": { "message": "Bilinear + RCAS" },
+  "qualityMinimalShort": { "message": "bilinear+RCAS" },
 
   "popupMasterSwitch": { "message": "Upscaling einschalten" },
   "popupNeedsAccess": { "message": "Zum Finden der Videos wird Zugriff auf Websites benötigt." },

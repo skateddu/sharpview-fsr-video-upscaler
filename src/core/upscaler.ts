@@ -2,9 +2,10 @@ import vertSrc from './shaders/fullscreen.vert.glsl';
 import commonSrc from './shaders/common.glsl';
 import bilinearSrc from './shaders/bilinear.frag.glsl';
 import easuSrc from './shaders/easu.frag.glsl';
+import bicubicSrc from './shaders/bicubic.frag.glsl';
 import rcasSrc from './shaders/rcas.frag.glsl';
 
-import { DEFAULT_SHARPNESS, type UpscaleMode } from './modes';
+import { DEFAULT_SHARPNESS, MODE_PASSES, type UpscaleMode } from './modes';
 
 export interface RenderOptions {
   mode: UpscaleMode;
@@ -39,14 +40,15 @@ interface Program {
   loc: Record<UniformName, WebGLUniformLocation | null>;
 }
 
-type ProgramName = 'bilinear' | 'easu' | 'rcas';
+type ProgramName = 'bilinear' | 'bicubic' | 'easu' | 'rcas';
 
 const SRC_UNIT = 0;
 const MID_UNIT = 1;
 
 /**
- * FSR1 upscaler on WebGL2. Draws `source` onto the canvas given to the constructor, at the
- * canvas's current resolution (canvas.width × canvas.height).
+ * FSR1 upscaler on WebGL2, with lighter bicubic and bilinear pipelines. Draws `source` onto
+ * the canvas given to the constructor, at the canvas's current resolution
+ * (canvas.width × canvas.height).
  */
 export class Upscaler {
   readonly gl: WebGL2RenderingContext;
@@ -101,10 +103,9 @@ export class Upscaler {
     this.upload(source, srcW, srcH);
     gl.bindVertexArray(this.vao);
 
-    const upscale: ProgramName = opts.mode === 'fsr' || opts.mode === 'easu' ? 'easu' : 'bilinear';
+    const { upscale, rcas } = MODE_PASSES[opts.mode];
     // RCAS is skipped for the modes without it and at zero sharpening (it would change nothing).
-    const sharpen = (opts.mode === 'fsr' || opts.mode === 'bilinear-rcas') && opts.sharpness > 0;
-    if (!sharpen) {
+    if (!rcas || opts.sharpness <= 0) {
       this.pass(upscale, null, outW, outH, split, opts);
       return;
     }
@@ -140,6 +141,7 @@ export class Upscaler {
     const gl = this.gl;
     this.programs = {
       bilinear: this.link(bilinearSrc),
+      bicubic: this.link(bicubicSrc),
       easu: this.link(easuSrc),
       rcas: this.link(rcasSrc),
     };

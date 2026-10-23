@@ -1,4 +1,4 @@
-import { Upscaler, FrameLoop, type Quality, type RenderOptions } from '../core';
+import { Upscaler, FrameLoop, lowerQuality, type Quality, type RenderOptions } from '../core';
 import { QUALITY_KEYS, toRenderOptions, type Settings } from '../shared/settings';
 import { PERMANENT_CODES, describeStatus, type Status, type VideoStatus } from '../shared/status';
 import { t } from '../shared/i18n';
@@ -43,8 +43,8 @@ export class VideoSession {
   /** null until IntersectionObserver has answered. */
   private onScreen: boolean | null = null;
   private releaseTimer = 0;
-  /** The GPU could not keep up: high quality reduced to light. */
-  private degraded = false;
+  /** The GPU could not keep up: quality reduced below the chosen one. */
+  private reduced: Quality | null = null;
   /** Not even the lightest quality kept up: native video until the source or quality changes. */
   private gpuSlow = false;
   /** Rendering options for the settings and the effective quality. */
@@ -65,7 +65,7 @@ export class VideoSession {
     private readonly budget: GpuBudget,
   ) {
     this.options = toRenderOptions(settings);
-    this.sharpenOptions = toRenderOptions(settings, 'light');
+    this.sharpenOptions = toRenderOptions(settings, 'minimal');
     this.loop = new FrameLoop(video, this.onVideoFrame);
     this.resizeObserver = new ResizeObserver(this.update);
     this.resizeObserver.observe(video);
@@ -91,7 +91,7 @@ export class VideoSession {
     this.settings = settings;
     if (qualityChanged) this.resetDegrade();
     this.options = toRenderOptions(settings, this.effectiveQuality());
-    this.sharpenOptions = toRenderOptions(settings, 'light');
+    this.sharpenOptions = toRenderOptions(settings, 'minimal');
     this.update();
   }
 
@@ -133,7 +133,7 @@ export class VideoSession {
       active: shown,
       quality: this.effectiveQuality(),
       sharpenOnly: shown && this.sharpenOnly,
-      degraded: this.degraded || this.gpuSlow,
+      degraded: this.reduced !== null || this.gpuSlow,
       fps: shown ? Math.round(this.meter.fps) : 0,
       videoFps: Math.round(this.meter.videoFps),
       costMs: shown ? Math.round(this.frameCost * 10) / 10 : 0,
@@ -151,18 +151,19 @@ export class VideoSession {
   }
 
   private effectiveQuality(): Quality {
-    return this.degraded ? 'light' : this.settings.quality;
+    return this.reduced ?? this.settings.quality;
   }
 
   /**
-   * Ladder: high → light → native video (GPU released). Takes effect from the next frame.
-   * Sharpening only already uses the light pipeline: straight to the native video.
+   * Ladder: high → light → minimal → native video (GPU released). Takes effect from the next
+   * frame. Sharpening only already uses the minimal pipeline: straight to the native video.
    */
   private stepDown(): void {
     this.governor.reset();
-    if (!this.degraded && this.settings.quality === 'high' && !this.sharpenOnly) {
-      this.degraded = true;
-      this.options = toRenderOptions(this.settings, 'light');
+    const lower = this.sharpenOnly ? null : lowerQuality(this.effectiveQuality());
+    if (lower) {
+      this.reduced = lower;
+      this.options = toRenderOptions(this.settings, lower);
     } else {
       this.gpuSlow = true;
       this.releaseGpu();
@@ -170,7 +171,7 @@ export class VideoSession {
   }
 
   private resetDegrade(): void {
-    this.degraded = false;
+    this.reduced = null;
     this.gpuSlow = false;
     this.governor.reset();
     this.options = toRenderOptions(this.settings);
@@ -312,7 +313,7 @@ export class VideoSession {
     const s = this.settings;
     const flags = [
       layout.sharpenOnly ? t('labelSharpenOnly') : t(QUALITY_KEYS[this.effectiveQuality()].short),
-      this.degraded && !layout.sharpenOnly ? t('labelReduced') : '',
+      this.reduced && !layout.sharpenOnly ? t('labelReduced') : '',
       s.sharpness ? '' : t('labelNoSharpening'),
       s.compare ? 'A/B' : '',
     ].filter(Boolean);

@@ -7,6 +7,14 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Light quality is now Bicubic + RCAS** instead of Bilinear + RCAS: sharper, closer to FSR1
+  (Catmull-Rom with 9 bilinear taps, about 0.12 ms more per 4K frame on an RTX 5070 Ti)
+- **Slow GPU fallback in three steps**: FSR1 → Bicubic + RCAS → Bilinear + RCAS → native video.
+  Bilinear + RCAS is no longer offered in the popup, but stays as the last step and for
+  sharpening at native size
+
 ## [1.1.0] - 2026-10-14
 
 ### Added

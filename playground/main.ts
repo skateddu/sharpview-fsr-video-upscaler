@@ -6,6 +6,8 @@ import { makeTestPattern } from './pattern';
 const MODE_LABELS: Record<UpscaleMode, string> = {
   fsr: 'FSR1 (EASU + RCAS)',
   easu: 'EASU only',
+  'bicubic-rcas': 'Bicubic + RCAS',
+  bicubic: 'Bicubic',
   'bilinear-rcas': 'Bilinear + RCAS',
   bilinear: 'Bilinear',
 };
