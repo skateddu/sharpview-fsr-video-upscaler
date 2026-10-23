@@ -1,4 +1,4 @@
-import { QUALITIES, type Quality } from '../core/modes';
+import { QUALITIES, type ChosenQuality } from '../core/modes';
 import {
   QUALITY_KEYS,
   isSiteEnabled,
@@ -74,7 +74,7 @@ enabled.addEventListener('change', () => save({ enabled: enabled.checked }));
 siteEnabled.addEventListener('change', () => {
   if (host) save(setSiteEnabled(settings, host, siteEnabled.checked));
 });
-quality.addEventListener('change', () => save({ quality: quality.value as Quality }));
+quality.addEventListener('change', () => save({ quality: quality.value as ChosenQuality }));
 sharpness.addEventListener('input', showSharpness);
 sharpness.addEventListener('change', () => save({ sharpness: Number(sharpness.value) }));
 denoise.addEventListener('change', () => save({ denoise: denoise.checked }));

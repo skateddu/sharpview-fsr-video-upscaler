@@ -2,8 +2,8 @@
 
 uniform vec2 u_outSize;    // render target size in pixels
 uniform bool u_flipY;      // true when drawing to the canvas (origin at the bottom left)
-uniform sampler2D u_src;   // source frame (LINEAR filtering for bilinear; texelFetch ignores it)
-uniform sampler2D u_in;    // upscaling input: the source frame, or the debanded one
+uniform sampler2D u_src;   // raw source frame, for the split comparison (LINEAR filtering)
+uniform sampler2D u_in;    // input of this pass: source, debanded source or upscaled frame
 uniform float u_split;     // output x left of which plain bilinear is shown; < 0 disables
 uniform bool u_dither;     // last pass of a debanded frame: dither to the 8-bit output
 

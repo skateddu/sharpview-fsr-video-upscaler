@@ -1,5 +1,5 @@
 // Pure logic with no extension APIs, so node --test can import it (hence the .ts extensions).
-import { DEFAULT_SHARPNESS, QUALITIES, type Quality } from '../core/modes.ts';
+import { DEFAULT_SHARPNESS, QUALITIES, type ChosenQuality, type Quality } from '../core/modes.ts';
 
 /** Stored with the settings, to tell schema versions apart if a future one needs a migration. */
 export const SETTINGS_VERSION = 2;
@@ -11,7 +11,7 @@ export interface Settings {
   version: number;
   /** Master switch. */
   enabled: boolean;
-  quality: Quality;
+  quality: ChosenQuality;
   /** RCAS sharpening in %: 100 = maximum, 0 = off. */
   sharpness: number;
   denoise: boolean;
@@ -73,7 +73,7 @@ export function normalizeSettings(raw: unknown): Settings {
   return {
     version: SETTINGS_VERSION,
     enabled: bool('enabled'),
-    quality: QUALITIES.includes(r.quality as Quality) ? (r.quality as Quality) : d.quality,
+    quality: QUALITIES.includes(r.quality as ChosenQuality) ? (r.quality as ChosenQuality) : d.quality,
     sharpness: Math.round(num('sharpness', 0, 100)),
     denoise: bool('denoise'),
     deband: bool('deband'),

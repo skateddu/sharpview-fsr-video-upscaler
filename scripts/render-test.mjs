@@ -85,21 +85,18 @@ const check = async (name, dataUrl, golden = name) => {
   expect(name, ok, r.sizeMismatch ?? `mean diff ${r.mean.toFixed(3)}, pixels >8: ${r.pctOver8.toFixed(3)}%`);
 };
 
-for (const mode of UPSCALE_MODES) {
-  await page.goto(`${base}?pattern&mode=${mode}&out=x3`);
+// Every mode, plus deband before FSR1 (half-float intermediate textures and dithered output).
+const cases = [...UPSCALE_MODES.map((mode) => [mode, `mode=${mode}`]), ['fsr-deband', 'mode=fsr&deband']];
+for (const [name, query] of cases) {
+  await page.goto(`${base}?pattern&${query}&out=x3`);
   await page.waitForFunction(() => document.body.dataset.status !== undefined, null, { timeout: 10000 });
   const status = await page.evaluate(() => document.body.dataset.status);
   if (status !== 'ok') {
-    expect(mode, false, await page.locator('#status').textContent());
+    expect(name, false, await page.locator('#status').textContent());
     continue;
   }
-  await check(mode, await snapshot());
+  await check(name, await snapshot());
 }
-
-// Deband before FSR1: half-float intermediate textures and dithered output.
-await page.goto(`${base}?pattern&mode=fsr&out=x3&deband`);
-await page.waitForFunction(() => document.body.dataset.status !== undefined, null, { timeout: 10000 });
-await check('fsr-deband', await snapshot());
 
 // Context loss and restore: rendering must resume identically.
 await page.goto(`${base}?pattern&mode=fsr&out=x3`);

@@ -1,10 +1,9 @@
 /*
  * FSR 1 RCAS (Robust Contrast Adaptive Sharpening).
  * Port of the fp32 path of ffx_fsr1.h (AMD, MIT license, see THIRD_PARTY_NOTICES.md).
- * Works 1:1: u_tex has the same size as the output.
+ * Works 1:1: u_in has the same size as the output.
  */
 
-uniform sampler2D u_tex;
 uniform float u_sharpness;  // 0..1: 1.0 = maximum sharpening (exp2(-stops) in the AMD original)
 uniform bool u_denoise;     // less sharpening on noise (useful on compressed video)
 
@@ -13,7 +12,7 @@ uniform bool u_denoise;     // less sharpening on noise (useful on compressed vi
 vec3 fetch(ivec2 p) {
   p = clamp(p, ivec2(0), ivec2(u_outSize) - 1);
   // RCAS produces NaN with negative input: clamp to [0, 1].
-  return clamp(texelFetch(u_tex, p, 0).rgb, 0.0, 1.0);
+  return clamp(texelFetch(u_in, p, 0).rgb, 0.0, 1.0);
 }
 
 void main() {

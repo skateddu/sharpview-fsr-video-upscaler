@@ -1,36 +1,36 @@
 // Upscaling modes. No dependencies, so node --test can import it too.
 
-export type UpscaleMode = 'fsr' | 'easu' | 'bicubic-rcas' | 'bicubic' | 'bilinear-rcas' | 'bilinear';
+export type UpscalePass = 'easu' | 'bicubic' | 'bilinear';
 
-export const UPSCALE_MODES: readonly UpscaleMode[] = [
-  'fsr',
-  'easu',
-  'bicubic-rcas',
-  'bicubic',
-  'bilinear-rcas',
-  'bilinear',
-];
-
-/** Passes of each mode: upscaling, then optional RCAS at 1:1. */
-export const MODE_PASSES: Record<UpscaleMode, { upscale: 'easu' | 'bicubic' | 'bilinear'; rcas: boolean }> = {
+/** Passes of each mode: upscaling, then optional RCAS at 1:1. The key order is the playground's. */
+export const MODE_PASSES = {
   fsr: { upscale: 'easu', rcas: true },
   easu: { upscale: 'easu', rcas: false },
   'bicubic-rcas': { upscale: 'bicubic', rcas: true },
   bicubic: { upscale: 'bicubic', rcas: false },
   'bilinear-rcas': { upscale: 'bilinear', rcas: true },
   bilinear: { upscale: 'bilinear', rcas: false },
-};
+} as const satisfies Record<string, { upscale: UpscalePass; rcas: boolean }>;
+
+export type UpscaleMode = keyof typeof MODE_PASSES;
+
+export const UPSCALE_MODES = Object.keys(MODE_PASSES) as readonly UpscaleMode[];
 
 /**
- * Rendering quality: high = FSR1 (EASU + RCAS), light = bicubic + RCAS, minimal = bilinear +
- * RCAS. The user chooses between high and light; minimal is the last step before the native
- * video on a GPU that cannot keep up, and the pipeline for sharpening at native size. The modes
- * without RCAS are for the playground and the tests.
+ * Rendering qualities, from the heaviest to the lightest: high = FSR1 (EASU + RCAS), light =
+ * bicubic + RCAS, minimal = bilinear + RCAS. The user chooses between high and light; minimal is
+ * the last step before the native video on a GPU that cannot keep up, and the pipeline for
+ * sharpening at native size. The modes without RCAS are for the playground and the tests.
  */
-export type Quality = 'high' | 'light' | 'minimal';
+const LADDER = ['high', 'light', 'minimal'] as const;
+
+export type Quality = (typeof LADDER)[number];
 
 /** Qualities offered to the user. */
-export const QUALITIES: readonly Quality[] = ['high', 'light'];
+export const QUALITIES = ['high', 'light'] as const satisfies readonly Quality[];
+
+/** A quality the user can choose (and the one stored in the settings). */
+export type ChosenQuality = (typeof QUALITIES)[number];
 
 const QUALITY_MODES: Record<Quality, UpscaleMode> = {
   high: 'fsr',
@@ -44,7 +44,7 @@ export function qualityMode(quality: Quality): UpscaleMode {
 
 /** Next lighter quality when the GPU cannot keep up; null when only the native video is left. */
 export function lowerQuality(quality: Quality): Quality | null {
-  return quality === 'high' ? 'light' : quality === 'light' ? 'minimal' : null;
+  return LADDER[LADDER.indexOf(quality) + 1] ?? null;
 }
 
 /** RCAS sharpening in percent: AMD's default of 0.2 stops is exp2(-0.2) ≈ 87%. */

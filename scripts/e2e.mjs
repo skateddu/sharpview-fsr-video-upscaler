@@ -74,6 +74,16 @@ const debug = () => debugIn(page);
 /** Status code with detail, for the check messages. */
 const why = (d) => (d ? `${d.code}${d.detail ? ` ${d.detail}` : ''}` : 'no session');
 
+/** Applies `patch`, checks that the `contain` video stays active and keeps drawing, then applies `reset`. */
+async function keepsDrawing(name, patch, reset) {
+  await page.evaluate((p) => window.__videoUpscaler.set(p), patch);
+  const before = (await debug()).contain.frames;
+  await page.waitForTimeout(600);
+  const d = (await debug()).contain;
+  expect(name, d.active && d.frames > before, why(d));
+  await page.evaluate((p) => window.__videoUpscaler.set(p), reset);
+}
+
 /** Corner of a video's content box (also inside the player's shadow root). */
 const videoCorner = (target, id) => target.evaluate((id) => {
   const el = id === 'shadow'
@@ -135,12 +145,7 @@ expect('render cadence ≈ video frames', cadence.video > 20 && cadence.render >
   `render ${cadence.render} / video ${cadence.video} in 2 s`);
 
 // A/B comparison: stays active and keeps drawing.
-await page.evaluate(() => window.__videoUpscaler.set({ compare: true }));
-const framesBefore = (await debug()).contain.frames;
-await page.waitForTimeout(600);
-state = await debug();
-expect('A/B comparison active', state.contain.active && state.contain.frames > framesBefore, why(state.contain));
-await page.evaluate(() => window.__videoUpscaler.set({ compare: false }));
+await keepsDrawing('A/B comparison active', { compare: true }, { compare: false });
 
 // Activation threshold: contain is ×3 (960 CSS px × dpr 2 / 640); with a ×4 threshold it goes native.
 await page.evaluate(() => window.__videoUpscaler.set({ minScale: 4 }));
@@ -203,21 +208,9 @@ expect('quality change → new attempt', state.contain.active && !state.contain.
   `${state.contain.quality}, ${why(state.contain)}`);
 await page.evaluate(() => window.__videoUpscaler.set({ quality: 'high' }));
 
-// Sharpness 0%: RCAS skipped, rendering continues.
-await page.evaluate(() => window.__videoUpscaler.set({ sharpness: 0 }));
-const framesSharp0 = (await debug()).contain.frames;
-await page.waitForTimeout(600);
-state = await debug();
-expect('sharpness 0% → active without RCAS', state.contain.active && state.contain.frames > framesSharp0, why(state.contain));
-await page.evaluate(() => window.__videoUpscaler.set({ sharpness: 87 }));
-
-// Deband: an extra pass before upscaling, rendering continues.
-await page.evaluate(() => window.__videoUpscaler.set({ deband: true }));
-const framesDeband = (await debug()).contain.frames;
-await page.waitForTimeout(600);
-state = await debug();
-expect('deband → active', state.contain.active && state.contain.frames > framesDeband, why(state.contain));
-await page.evaluate(() => window.__videoUpscaler.set({ deband: false }));
+// Sharpness 0% (RCAS skipped) and deband (an extra pass before upscaling): rendering continues.
+await keepsDrawing('sharpness 0% → active without RCAS', { sharpness: 0 }, { sharpness: 87 });
+await keepsDrawing('deband → active', { deband: true }, { deband: false });
 
 // Turning off and on again from the settings.
 await page.evaluate(() => window.__videoUpscaler.set({ enabled: false }));

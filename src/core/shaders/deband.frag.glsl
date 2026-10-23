@@ -21,12 +21,12 @@ float rand(inout float h) {
 }
 
 vec3 sampleAt(vec2 p) {
-  return texture(u_src, p / u_inSize).rgb;
+  return texture(u_in, p / u_inSize).rgb;
 }
 
 void main() {
   vec2 p = outPos();
-  vec3 c = texelFetch(u_src, ivec2(p), 0).rgb;
+  vec3 c = texelFetch(u_in, ivec2(p), 0).rgb;
   // Fixed per pixel, so a still frame always gives the same result.
   float h = fract(dot(p, vec2(12.9898, 78.233)) * 0.3183099) * 4096.0 + 1.0;
 
