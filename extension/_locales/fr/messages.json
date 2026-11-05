@@ -58,7 +58,7 @@
   "statusNoFrame": { "message": "Chargement…" },
   "statusHidden": { "message": "Vidéo masquée" },
   "statusTooSmall": { "message": "Vidéo trop petite" },
-  "statusTransform": { "message": "Vidéo pivotée ou redimensionnée en CSS : non prise en charge" },
+  "statusTransform": { "message": "Vidéo pivotée ou inversée en CSS : non prise en charge" },
   "statusFullscreenVideo": { "message": "Plein écran du seul élément vidéo : non pris en charge" },
   "statusNotNeeded": {
     "message": "Inutile : la vidéo est déjà aussi grande que le lecteur (×$SCALE$)",

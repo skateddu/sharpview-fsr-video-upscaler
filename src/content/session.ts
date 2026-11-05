@@ -229,6 +229,8 @@ export class VideoSession {
       display: style.display,
       visibility: style.visibility,
       transform: style.transform,
+      scale: style.scale,
+      rotate: style.rotate,
       objectFit: style.objectFit,
       objectPosition: style.objectPosition,
       devicePixelRatio,

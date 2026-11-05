@@ -7,6 +7,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+
+- **Videos zoomed with CSS** (`transform: scale()` or the `scale` property, as zoom-to-fill
+  extensions such as UltraWideo do) are now upscaled at their enlarged size. Before, the canvas
+  covered them at their original size (`scale` property) or they stayed native (`transform`).
+  Rotated or mirrored videos still stay native
+
 ## [1.2.0] - 2026-10-23
 
 ### Added

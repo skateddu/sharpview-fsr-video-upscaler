@@ -115,6 +115,9 @@ const expected = {
   late: { x: 0, y: 0, width: 640, height: 360 },
   ancestor: { x: 0, y: 0, width: 640, height: 360 },
   translated: { x: 0, y: 0, width: 640, height: 360 },
+  // Own scale: the content grows with it (×1.1; ×1.5 by ×1.25, clipped by its container).
+  scaled: { x: 0, y: 0, width: 704, height: 396 },
+  zoomed: { x: 0, y: 0, width: 960, height: 450 },
   position: { x: 0, y: 0, width: 960, height: 540 },
   shadow: { x: 0, y: 0, width: 640, height: 360 },
 };
@@ -123,11 +126,15 @@ let state = await debug();
 for (const [id, content] of Object.entries(expected)) await checkAligned(page, id, content, state[id]);
 // Video inside an iframe: frame coordinates.
 await checkAligned(frame, 'framed', { x: 0, y: 0, width: 640, height: 360 }, (await debugIn(frame)).framed);
+// Their WebGL contexts are needed later, for the videos added by the incremental scan (12 per frame).
+await page.evaluate(() => {
+  document.getElementById('scaled').remove();
+  document.getElementById('zoomed-box').remove();
+});
 
 const nativeWith = (id, code) => expect(`${id}: native (${code})`, !!state[id] && !state[id].active && state[id].code === code, why(state[id]));
 nativeWith('small', 'not-needed');
 nativeWith('cross', 'cross-origin');
-nativeWith('scaled', 'transform');
 nativeWith('offscreen', 'offscreen');
 if (drmSetup === 'ok') nativeWith('drm', 'drm');
 else note(`skip drm: ClearKey not available (${drmSetup})`);

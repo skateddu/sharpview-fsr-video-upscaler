@@ -58,7 +58,7 @@
   "statusNoFrame": { "message": "Cargando…" },
   "statusHidden": { "message": "Vídeo oculto" },
   "statusTooSmall": { "message": "Vídeo demasiado pequeño" },
-  "statusTransform": { "message": "Vídeo girado o escalado con CSS: no compatible" },
+  "statusTransform": { "message": "Vídeo girado o reflejado con CSS: no compatible" },
   "statusFullscreenVideo": { "message": "Pantalla completa solo del elemento de vídeo: no compatible" },
   "statusNotNeeded": {
     "message": "No hace falta: el vídeo ya es tan grande como el reproductor (×$SCALE$)",

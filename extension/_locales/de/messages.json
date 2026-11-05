@@ -58,7 +58,7 @@
   "statusNoFrame": { "message": "Wird geladen…" },
   "statusHidden": { "message": "Video ausgeblendet" },
   "statusTooSmall": { "message": "Video zu klein" },
-  "statusTransform": { "message": "Video per CSS gedreht oder skaliert: nicht unterstützt" },
+  "statusTransform": { "message": "Video per CSS gedreht oder gespiegelt: nicht unterstützt" },
   "statusFullscreenVideo": { "message": "Vollbild nur des Video-Elements: nicht unterstützt" },
   "statusNotNeeded": {
     "message": "Nicht nötig: Das Video ist schon so groß wie der Player (×$SCALE$)",

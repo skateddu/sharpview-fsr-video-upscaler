@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { evaluateLayout, isTranslationOnly, type LayoutInput } from '../../src/content/layout.ts';
+import { evaluateLayout, ownScale, type LayoutInput } from '../../src/content/layout.ts';
 
 const base: LayoutInput = {
   videoWidth: 640,
@@ -10,6 +10,8 @@ const base: LayoutInput = {
   display: 'block',
   visibility: 'visible',
   transform: 'none',
+  scale: 'none',
+  rotate: 'none',
   objectFit: 'contain',
   objectPosition: '50% 50%',
   devicePixelRatio: 2,
@@ -42,7 +44,8 @@ test('reasons to stay native, in the order they are checked', () => {
   };
   assert.equal(code({ display: 'none' }), 'hidden');
   assert.equal(code({ visibility: 'hidden' }), 'hidden');
-  assert.equal(code({ transform: 'matrix(1.1, 0, 0, 1.1, 0, 0)' }), 'transform');
+  assert.equal(code({ transform: 'matrix(0.866, 0.5, -0.5, 0.866, 0, 0)' }), 'transform');
+  assert.equal(code({ rotate: '90deg' }), 'transform');
   assert.equal(code({ boxWidth: 100 }), 'too-small');
   assert.equal(code({ devicePixelRatio: 0.5 }), 'not-needed');
   // A hidden video is not judged by size or scale.
@@ -77,11 +80,41 @@ test('below the threshold: sharpening only, when enabled, for videos at least at
   assert.ok(up.ok && !up.layout.sharpenOnly);
 });
 
-test('isTranslationOnly', () => {
-  assert.equal(isTranslationOnly('none'), true);
-  assert.equal(isTranslationOnly(''), true);
-  assert.equal(isTranslationOnly('matrix(1, 0, 0, 1, -320, -180)'), true);
-  assert.equal(isTranslationOnly('matrix(-1, 0, 0, 1, 0, 0)'), false);
-  assert.equal(isTranslationOnly('matrix(0.866, 0.5, -0.5, 0.866, 0, 0)'), false);
-  assert.equal(isTranslationOnly('matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)'), false);
+test('ownScale: translations, scale from transform and from the scale property', () => {
+  assert.deepEqual(ownScale('none', 'none', 'none'), [1, 1]);
+  assert.deepEqual(ownScale('', '', ''), [1, 1]);
+  assert.deepEqual(ownScale('matrix(1, 0, 0, 1, -320, -180)', 'none', 'none'), [1, 1]);
+  assert.deepEqual(ownScale('matrix(1.1, 0, 0, 1.1, 0, 0)', 'none', 'none'), [1.1, 1.1]);
+  // Zoom-to-fill extensions: individual properties, also non-uniform, combined with transform.
+  assert.deepEqual(ownScale('none', '1.5', 'none'), [1.5, 1.5]);
+  assert.deepEqual(ownScale('none', '1.25 1.5', 'none'), [1.25, 1.5]);
+  assert.deepEqual(ownScale('none', '125% 150%', 'none'), [1.25, 1.5]);
+  assert.deepEqual(ownScale('matrix(2, 0, 0, 2, 0, 0)', '1.5 1', 'none'), [3, 2]);
+  assert.deepEqual(ownScale('none', '1.5 1.5 1', 'none'), [1.5, 1.5]);
+});
+
+test('ownScale: what the canvas cannot follow', () => {
+  assert.equal(ownScale('matrix(-1, 0, 0, 1, 0, 0)', 'none', 'none'), null);
+  assert.equal(ownScale('none', '-1 1', 'none'), null);
+  assert.equal(ownScale('matrix(0.866, 0.5, -0.5, 0.866, 0, 0)', 'none', 'none'), null);
+  assert.equal(ownScale('matrix(1, 0, 0.5, 1, 0, 0)', 'none', 'none'), null);
+  assert.equal(ownScale('matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)', 'none', 'none'), null);
+  assert.equal(ownScale('none', '1 1 2', 'none'), null);
+  assert.equal(ownScale('none', 'none', '10deg'), null);
+});
+
+test('scaled video: the canvas covers the enlarged content, clipped to the enlarged box', () => {
+  // 960×720 box, ×1.5 zoom: content 1440×810 at (0, 135), still inside the 1440×1080 box.
+  const r = evaluateLayout({ ...base, scale: '1.5' });
+  assert.ok(r.ok);
+  assert.deepEqual(r.layout.content, { x: 0, y: 135, width: 1440, height: 810 });
+  assert.deepEqual(r.layout.clip, [0, 0, 0, 0]);
+  assert.equal(r.layout.scale, 4.5);
+  assert.deepEqual([r.layout.outWidth, r.layout.outHeight], [2880, 1620]);
+  // Stretched horizontally only (16:9 on an ultrawide screen): the scale is the smaller axis.
+  const wide = evaluateLayout({ ...base, scale: '1.33 1' });
+  assert.ok(wide.ok);
+  assert.equal(wide.layout.content.width, 960 * 1.33);
+  assert.equal(wide.layout.content.height, 540);
+  assert.equal(wide.layout.scale, 3);
 });

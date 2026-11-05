@@ -58,7 +58,7 @@
   "statusNoFrame": { "message": "In caricamento…" },
   "statusHidden": { "message": "Video nascosto" },
   "statusTooSmall": { "message": "Video troppo piccolo" },
-  "statusTransform": { "message": "Video ruotato o ridimensionato via CSS: non supportato" },
+  "statusTransform": { "message": "Video ruotato o specchiato via CSS: non supportato" },
   "statusFullscreenVideo": { "message": "Schermo intero del solo video: non supportato" },
   "statusNotNeeded": {
     "message": "Non serve: il video è già grande quanto il player (×$SCALE$)",

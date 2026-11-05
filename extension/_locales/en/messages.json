@@ -58,7 +58,7 @@
   "statusNoFrame": { "message": "Loading…" },
   "statusHidden": { "message": "Video hidden" },
   "statusTooSmall": { "message": "Video too small" },
-  "statusTransform": { "message": "Video rotated or scaled with CSS: not supported" },
+  "statusTransform": { "message": "Video rotated or mirrored with CSS: not supported" },
   "statusFullscreenVideo": { "message": "Fullscreen of the video element alone: not supported" },
   "statusNotNeeded": {
     "message": "Not needed: the video is already as large as the player (×$SCALE$)",

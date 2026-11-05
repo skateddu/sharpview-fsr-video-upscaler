@@ -109,7 +109,7 @@ popup / options     switches, quality, sharpness, per-site rules
   its position is corrected by measuring the real offset on screen, which covers transformed
   ancestors and `translate(-50%, -50%)` centering.
 - **When the video stays native.** Below the activation threshold (×1.05 by default), for
-  hidden, tiny or off-screen videos, CSS-scaled or rotated videos, fullscreen of the `<video>`
+  hidden, tiny or off-screen videos, CSS-rotated or mirrored videos, fullscreen of the `<video>`
   element alone, DRM, cross-origin frames without CORS and missing WebGL. The popup and the info
   label show the reason.
 - **Performance.** Per-frame work happens only while upscaling; native videos are re-evaluated
