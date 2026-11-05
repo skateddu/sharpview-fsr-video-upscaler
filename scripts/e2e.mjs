@@ -139,6 +139,15 @@ nativeWith('offscreen', 'offscreen');
 if (drmSetup === 'ok') nativeWith('drm', 'drm');
 else note(`skip drm: ClearKey not available (${drmSetup})`);
 
+// Hover preview with preload="none": left out of the popup until it plays, then listed.
+expect('idle preview: not listed', state.idle?.relevant === false && state.idle.code === 'no-frame', why(state.idle));
+await page.evaluate(() => document.getElementById('idle').play());
+await page.waitForTimeout(800);
+const idle = (await debug()).idle;
+expect('idle preview: listed once playing', idle?.relevant === true, why(idle));
+// Its WebGL context is needed later, like the scaled videos'.
+await page.evaluate(() => document.getElementById('idle').remove());
+
 // Cadence: one render per video frame.
 const cadence = await page.evaluate(async () => {
   const v = document.getElementById('contain');

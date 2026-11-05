@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Popup and info label skip idle videos**: paused videos that have loaded nothing yet (hover
+  previews with `preload="none"`, e.g. on store pages, or players not started) are no longer
+  listed; they appear as soon as they play. Upscaling is unchanged
+
 ### Fixed
 
 - **Videos zoomed with CSS** (`transform: scale()` or the `scale` property, as zoom-to-fill

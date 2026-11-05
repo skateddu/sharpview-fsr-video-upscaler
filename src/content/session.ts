@@ -144,10 +144,14 @@ export class VideoSession {
     };
   }
 
-  /** Real-size video (not a preview, tracker or hidden element). */
+  /**
+   * Real-size video (not a preview, tracker or hidden element) that has loaded or started
+   * something: paused ones with nothing loaded (hover previews with preload="none", players not
+   * started yet) are left out of the popup and the info label.
+   */
   private isRelevant(): boolean {
     const v = this.video;
-    return v.isConnected && v.clientWidth >= MIN_BOX && v.clientHeight >= MIN_BOX;
+    return v.isConnected && v.clientWidth >= MIN_BOX && v.clientHeight >= MIN_BOX && (v.videoWidth > 0 || !v.paused);
   }
 
   private effectiveQuality(): Quality {

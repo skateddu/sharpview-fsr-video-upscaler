@@ -12,7 +12,7 @@
     #fill { width: 800px; height: 300px; object-fit: fill; border: 7px solid #555; }
     #small { width: 320px; height: 180px; }
     #fixed { position: fixed; right: 20px; bottom: 20px; width: 480px; height: 270px; }
-    #cross, #drm, #late, #ancestor, #scaled, #zoomed { width: 640px; height: 360px; }
+    #cross, #drm, #late, #ancestor, #scaled, #zoomed, #idle { width: 640px; height: 360px; }
     /* Transformed but non-positioned ancestor: containing block ≠ offsetParent. */
     #ancestor-wrap { transform: translateX(30px); }
     /* Typical player centering: translate(-50%, -50%). */
@@ -43,6 +43,8 @@
   <video id="scaled" muted loop></video>
   <div id="zoomed-box"><video id="zoomed" muted loop></video></div>
   <video id="position" muted loop></video>
+  <!-- Hover preview: nothing loaded until it is played. -->
+  <video id="idle" preload="none" muted loop src="/sample.webm"></video>
   <shadow-player id="shadow-host"></shadow-player>
   <iframe id="frame" src="/frame.html"></iframe>
   <video id="offscreen" muted loop></video>
