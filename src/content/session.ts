@@ -58,14 +58,16 @@ export class VideoSession {
   private measureNext = true;
   /** Last measured cost: upload + draw until the GPU has completed it, in ms. */
   private frameCost = 0;
+  /** Position of the A/B line, moved with Ctrl + mouse; back to the middle when turned on again. */
+  private split = 0.5;
 
   constructor(
     readonly video: HTMLVideoElement,
     private settings: Settings,
     private readonly budget: GpuBudget,
   ) {
-    this.options = toRenderOptions(settings);
-    this.sharpenOptions = toRenderOptions(settings, 'minimal');
+    this.options = this.renderOptions(settings.quality);
+    this.sharpenOptions = this.renderOptions('minimal');
     this.loop = new FrameLoop(video, this.onVideoFrame);
     this.resizeObserver = new ResizeObserver(this.update);
     this.resizeObserver.observe(video);
@@ -88,11 +90,26 @@ export class VideoSession {
 
   setSettings(settings: Settings): void {
     const qualityChanged = settings.quality !== this.settings.quality;
+    if (settings.compare && !this.settings.compare) this.split = 0.5;
     this.settings = settings;
     if (qualityChanged) this.resetDegrade();
-    this.options = toRenderOptions(settings, this.effectiveQuality());
-    this.sharpenOptions = toRenderOptions(settings, 'minimal');
+    this.options = this.renderOptions(this.effectiveQuality());
+    this.sharpenOptions = this.renderOptions('minimal');
     this.update();
+  }
+
+  /**
+   * Moves the A/B line to the pointer if it is over this video's canvas; returns false if not.
+   * A paused video is redrawn at once, a playing one with its next frame.
+   */
+  moveSplit(clientX: number, clientY: number): boolean {
+    if (!this.settings.compare || !this.overlay.shown) return false;
+    const r = this.overlay.canvas.getBoundingClientRect();
+    if (clientX < r.left || clientX > r.right || clientY < r.top || clientY > r.bottom) return false;
+    this.split = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+    this.options.split = this.sharpenOptions.split = this.split;
+    if (this.video.paused) this.update();
+    return true;
   }
 
   dispose(): void {
@@ -141,6 +158,7 @@ export class VideoSession {
       output: `${this.overlay.canvas.width}×${this.overlay.canvas.height}`,
       canvasRect: r && { x: r.x, y: r.y, width: r.width, height: r.height },
       frames: this.frames,
+      split: this.options.split,
     };
   }
 
@@ -158,6 +176,10 @@ export class VideoSession {
     return this.reduced ?? this.settings.quality;
   }
 
+  private renderOptions(quality: Quality): RenderOptions {
+    return toRenderOptions(this.settings, quality, this.split);
+  }
+
   /**
    * Ladder: high → light → minimal → native video (GPU released). Takes effect from the next
    * frame. Sharpening only already uses the minimal pipeline: straight to the native video.
@@ -167,7 +189,7 @@ export class VideoSession {
     const lower = this.sharpenOnly ? null : lowerQuality(this.effectiveQuality());
     if (lower) {
       this.reduced = lower;
-      this.options = toRenderOptions(this.settings, lower);
+      this.options = this.renderOptions(lower);
     } else {
       this.gpuSlow = true;
       this.releaseGpu();
@@ -178,7 +200,7 @@ export class VideoSession {
     this.reduced = null;
     this.gpuSlow = false;
     this.governor.reset();
-    this.options = toRenderOptions(this.settings);
+    this.options = this.renderOptions(this.settings.quality);
   }
 
   private readonly onNewSource = () => {

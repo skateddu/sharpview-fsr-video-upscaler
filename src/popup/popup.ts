@@ -29,6 +29,7 @@ const denoise = $<HTMLInputElement>('denoise');
 const deband = $<HTMLInputElement>('deband');
 const showInfo = $<HTMLInputElement>('showInfo');
 const compare = $<HTMLInputElement>('compare');
+const compareHint = $<HTMLElement>('compare-hint');
 const videos = $<HTMLUListElement>('videos');
 
 localizePage();
@@ -58,6 +59,7 @@ function render(): void {
   deband.checked = settings.deband;
   showInfo.checked = settings.showInfo;
   compare.checked = settings.compare;
+  compareHint.hidden = !settings.compare;
 }
 
 function showSharpness(): void {

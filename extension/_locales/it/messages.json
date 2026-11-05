@@ -32,6 +32,7 @@
   "popupDeband": { "message": "Sfumature più morbide (deband)" },
   "popupShowInfo": { "message": "Info sul video" },
   "popupCompare": { "message": "Confronto A/B" },
+  "popupCompareHint": { "message": "Tieni premuto Ctrl e muovi il mouse sul video per spostare la linea" },
   "popupVideosInTab": { "message": "Video in questa scheda" },
   "popupSearching": { "message": "Ricerca…" },
   "popupMoreSettings": { "message": "Altre impostazioni" },

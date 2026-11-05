@@ -64,6 +64,8 @@ export interface VideoStatus extends Status {
   output: string;
   canvasRect: { x: number; y: number; width: number; height: number } | null;
   frames: number;
+  /** Position of the A/B line (fraction of the width); -1 without the comparison. */
+  split: number;
 }
 
 export interface StatusMessage {

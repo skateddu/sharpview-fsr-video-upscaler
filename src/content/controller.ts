@@ -40,6 +40,8 @@ export class Controller {
   private scanTimer = 0;
   private graceTimer = 0;
   private fullScanTimer = 0;
+  /** The pointer listener for the A/B line is registered (only while the comparison is on). */
+  private tracking = false;
 
   constructor() {
     this.budget.reclaim = () => {
@@ -59,6 +61,7 @@ export class Controller {
     } else {
       for (const s of this.sessions.values()) s.setSettings(settings);
     }
+    this.trackPointer(this.running && settings.compare);
   }
 
   snapshot(): VideoStatus[] {
@@ -79,6 +82,7 @@ export class Controller {
 
   private stop(): void {
     this.running = false;
+    this.trackPointer(false);
     this.observer.disconnect();
     this.observedRoots = new WeakSet();
     clearTimeout(this.scanTimer);
@@ -90,6 +94,22 @@ export class Controller {
     this.detached.clear();
     this.added.clear();
   }
+
+  /**
+   * Ctrl + mouse over a video moves its A/B line. Listened to on the window in the capture phase
+   * and without capturing clicks, so the player's own layers on top of the video do not hide it.
+   */
+  private trackPointer(on: boolean): void {
+    if (on === this.tracking) return;
+    this.tracking = on;
+    if (on) window.addEventListener('pointermove', this.onPointerMove, { capture: true, passive: true });
+    else window.removeEventListener('pointermove', this.onPointerMove, { capture: true });
+  }
+
+  private readonly onPointerMove = (e: PointerEvent) => {
+    if (!e.ctrlKey) return;
+    for (const s of this.sessions.values()) if (s.moveSplit(e.clientX, e.clientY)) return;
+  };
 
   private observe(root: Node): void {
     if (this.observedRoots.has(root)) return;

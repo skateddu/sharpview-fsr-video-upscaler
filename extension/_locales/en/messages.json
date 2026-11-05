@@ -32,6 +32,7 @@
   "popupDeband": { "message": "Smoother gradients (deband)" },
   "popupShowInfo": { "message": "Info on the video" },
   "popupCompare": { "message": "A/B comparison" },
+  "popupCompareHint": { "message": "Hold Ctrl and move the mouse over the video to move the line" },
   "popupVideosInTab": { "message": "Videos in this tab" },
   "popupSearching": { "message": "Searching…" },
   "popupMoreSettings": { "message": "More settings" },

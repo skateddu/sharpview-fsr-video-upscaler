@@ -32,6 +32,7 @@
   "popupDeband": { "message": "Degradados más suaves (deband)" },
   "popupShowInfo": { "message": "Info en el vídeo" },
   "popupCompare": { "message": "Comparación A/B" },
+  "popupCompareHint": { "message": "Mantén Ctrl y mueve el ratón sobre el vídeo para mover la línea" },
   "popupVideosInTab": { "message": "Vídeos en esta pestaña" },
   "popupSearching": { "message": "Buscando…" },
   "popupMoreSettings": { "message": "Más ajustes" },

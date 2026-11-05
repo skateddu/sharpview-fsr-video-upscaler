@@ -163,6 +163,27 @@ expect('render cadence ≈ video frames', cadence.video > 20 && cadence.render >
 // A/B comparison: stays active and keeps drawing.
 await keepsDrawing('A/B comparison active', { compare: true }, { compare: false });
 
+// A/B line: Ctrl + mouse over the video moves it, without Ctrl it stays, turned on again it is centered.
+await page.evaluate(() => window.__videoUpscaler.set({ compare: true }));
+await page.waitForTimeout(200);
+const abRect = (await debug()).contain.canvasRect;
+const abAt = (f) => [abRect.x + abRect.width * f, abRect.y + abRect.height / 2];
+const abSplit = async () => (await debug()).contain.split;
+await page.mouse.move(...abAt(0.5));
+await page.keyboard.down('Control');
+await page.mouse.move(...abAt(0.25), { steps: 3 });
+await page.keyboard.up('Control');
+let split = await abSplit();
+expect('A/B line follows Ctrl + mouse', Math.abs(split - 0.25) < 0.02, split.toFixed(3));
+await page.mouse.move(...abAt(0.8), { steps: 3 });
+split = await abSplit();
+expect('A/B line stays without Ctrl', Math.abs(split - 0.25) < 0.02, split.toFixed(3));
+await page.evaluate(() => window.__videoUpscaler.set({ compare: false }));
+await page.evaluate(() => window.__videoUpscaler.set({ compare: true }));
+split = await abSplit();
+expect('A/B line back to the middle when turned on again', split === 0.5, String(split));
+await page.evaluate(() => window.__videoUpscaler.set({ compare: false }));
+
 // Activation threshold: contain is ×3 (960 CSS px × dpr 2 / 640); with a ×4 threshold it goes native.
 await page.evaluate(() => window.__videoUpscaler.set({ minScale: 4 }));
 await page.waitForTimeout(300);

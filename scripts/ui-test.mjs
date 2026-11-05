@@ -132,8 +132,10 @@ for (const scheme of ['light', 'dark']) {
   expect('popup: denoise hidden when sharpening is off', await page.locator('#denoise-field').isHidden());
   await page.locator('#sharpness').fill('87');
 
+  expect('popup: A/B line hint hidden without the comparison', await page.locator('#compare-hint').isHidden());
   await page.click('#compare');
   expect('popup: A/B comparison saved', (await settingsOf(page)).compare === true);
+  expect('popup: A/B line hint shown with the comparison', await page.locator('#compare-hint').isVisible());
   await page.click('#deband');
   expect('popup: deband saved', (await settingsOf(page)).deband === true);
 

@@ -32,6 +32,7 @@
   "popupDeband": { "message": "Weichere Farbverläufe (Deband)" },
   "popupShowInfo": { "message": "Infos im Video" },
   "popupCompare": { "message": "A/B-Vergleich" },
+  "popupCompareHint": { "message": "Strg gedrückt halten und die Maus über das Video bewegen, um die Linie zu verschieben" },
   "popupVideosInTab": { "message": "Videos in diesem Tab" },
   "popupSearching": { "message": "Suche…" },
   "popupMoreSettings": { "message": "Weitere Einstellungen" },

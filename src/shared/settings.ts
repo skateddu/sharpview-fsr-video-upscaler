@@ -41,7 +41,16 @@ export function onSettingsChanged(callback: (settings: Settings) => void): void 
   });
 }
 
-/** Rendering options for the settings, at the given quality (lower than chosen on a slow GPU). */
-export function toRenderOptions(s: Settings, quality: Quality = s.quality): RenderOptions {
-  return { mode: qualityMode(quality), sharpness: s.sharpness, denoise: s.denoise, deband: s.deband, split: s.compare ? 0.5 : -1 };
+/**
+ * Rendering options for the settings, at the given quality (lower than chosen on a slow GPU) and
+ * with the A/B line at `split` (fraction of the width) when the comparison is on.
+ */
+export function toRenderOptions(s: Settings, quality: Quality = s.quality, split = 0.5): RenderOptions {
+  return {
+    mode: qualityMode(quality),
+    sharpness: s.sharpness,
+    denoise: s.denoise,
+    deband: s.deband,
+    split: s.compare ? split : -1,
+  };
 }

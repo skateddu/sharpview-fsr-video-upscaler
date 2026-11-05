@@ -28,7 +28,8 @@ recent NVIDIA, AMD and Intel ones.
 - **Sharpening at native size** (optional): videos that are not enlarged get RCAS sharpening
   only, e.g. a 1080p video on a 1080p screen
 - **Per-site control**: run everywhere except excluded sites, or only on allowed sites
-- **A/B comparison**: plain bilinear on the left, upscaler on the right, to judge the result
+- **A/B comparison**: plain bilinear on the left, upscaler on the right, to judge the result;
+  hold Ctrl and move the mouse over the video to move the line
 - **Info label**: input and output resolution, scale, fps and GPU time per frame on the video, or
   why it stays native
 - **Private**: no network requests, no data collection; settings sync with your Firefox account

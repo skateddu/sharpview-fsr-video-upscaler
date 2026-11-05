@@ -7,6 +7,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Movable A/B line**: with the comparison on, hold Ctrl and move the mouse over the video to
+  move the line; it is back in the middle every time the comparison is turned on. A hint in the
+  popup explains it
+
 ### Changed
 
 - **Popup and info label skip idle videos**: paused videos that have loaded nothing yet (hover
