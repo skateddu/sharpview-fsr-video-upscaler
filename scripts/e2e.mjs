@@ -169,6 +169,13 @@ await page.waitForTimeout(200);
 const abRect = (await debug()).contain.canvasRect;
 const abAt = (f) => [abRect.x + abRect.width * f, abRect.y + abRect.height / 2];
 const abSplit = async () => (await debug()).contain.split;
+// A transparent player layer over the video that swallows pointer events, like YouTube's.
+await page.evaluate(() => {
+  const layer = Object.assign(document.createElement('div'), { id: 'player-layer' });
+  layer.style.cssText = 'position: absolute; inset: 0; z-index: 10';
+  layer.addEventListener('pointermove', (e) => e.stopPropagation());
+  document.getElementById('contain').after(layer);
+});
 await page.mouse.move(...abAt(0.5));
 await page.keyboard.down('Control');
 await page.mouse.move(...abAt(0.25), { steps: 3 });
@@ -178,6 +185,7 @@ expect('A/B line follows Ctrl + mouse', Math.abs(split - 0.25) < 0.02, split.toF
 await page.mouse.move(...abAt(0.8), { steps: 3 });
 split = await abSplit();
 expect('A/B line stays without Ctrl', Math.abs(split - 0.25) < 0.02, split.toFixed(3));
+await page.evaluate(() => document.getElementById('player-layer').remove());
 await page.evaluate(() => window.__videoUpscaler.set({ compare: false }));
 await page.evaluate(() => window.__videoUpscaler.set({ compare: true }));
 split = await abSplit();
