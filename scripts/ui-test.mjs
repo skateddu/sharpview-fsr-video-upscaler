@@ -113,7 +113,7 @@ for (const scheme of ['light', 'dark']) {
   s = await settingsOf(page);
   expect('popup: site switch → enabled again', s.blockedSites.length === 0);
 
-  expect('popup: two qualities', (await page.locator('#quality option').count()) === 2);
+  expect('popup: three qualities', (await page.locator('#quality option').count()) === 3);
   expect('popup: shortcuts read from Firefox', (await page.textContent('[data-shortcut=toggle-info]')) === 'Ctrl+Alt+I' &&
     (await page.getAttribute('[data-shortcut-title=toggle]', 'title')) === 'Alt+Shift+U');
   expect('popup: unassigned shortcut hidden', await page.locator('[data-shortcut=toggle-compare]').isHidden());

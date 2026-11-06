@@ -9,15 +9,20 @@
 
 **Sharpview** is a Firefox extension that upscales HTML5 videos in real time with **AMD
 FidelityFX Super Resolution 1** (EASU + RCAS) on WebGL2. Lightweight and spatial: no CUDA, no
-neural networks, no data sent anywhere. It runs on any graphics card, from integrated GPUs to
-recent NVIDIA, AMD and Intel ones.
+data sent anywhere. It runs on any graphics card, from integrated GPUs to recent NVIDIA, AMD and
+Intel ones. For animation, an optional **Anime4K** quality runs a small neural network made of
+WebGL shaders, also on the GPU, with nothing to download.
 
 ## Features
 
 - **FSR1 upscaling** on every video shown larger than its resolution: YouTube, Twitch,
   Dailymotion, embedded players, videos in iframes and shadow DOM
-- **Two qualities**: FSR1 (EASU + RCAS) and a lighter Bicubic + RCAS for weak GPUs, with
-  adjustable sharpness (0% turns sharpening off)
+- **Three qualities**: FSR1 (EASU + RCAS), a lighter Bicubic + RCAS for weak GPUs, both with
+  adjustable sharpness (0% turns sharpening off), and Anime4K for animation
+- **Anime4K** (optional, for animation): the "Mode B (Fast)" preset of
+  [Anime4K](https://github.com/bloc97/Anime4K) v4, which gently removes compression artifacts and
+  blur and then doubles the resolution. It needs a capable GPU: about 1.5 ms per 1080p → 1440p frame
+  on an RTX 5070 Ti Laptop, against 0.2 ms for FSR1
 - **Deband** (optional): smooths the steps that compression leaves on skies, fog and dark
   gradients, before upscaling; real edges and fine detail stay as they are
 - **Automatic fallbacks**: the original video stays visible when upscaling is not needed, for
@@ -66,7 +71,7 @@ or allowed sites, the activation threshold and sharpening for videos that are no
 | Shortcut | Action |
 | --- | --- |
 | `Alt+Shift+U` | Turn upscaling on/off |
-| `Alt+Shift+G` | Switch FSR1 (EASU + RCAS) / Bicubic + RCAS |
+| `Alt+Shift+G` | Cycle quality: FSR1 / Bicubic + RCAS / Anime4K |
 | `Alt+Shift+I` | Show resolution and fps on the video |
 | `Alt+Shift+O` | A/B comparison: bilinear on the left, upscaler on the right |
 | (unassigned) | Deband on/off |
@@ -92,7 +97,8 @@ content script (one per frame)
     layout          eligibility and geometry (pure)
     overlay         canvas and info label laid over the video
     perf            frame rate, slow-GPU detection, WebGL context budget (pure)
-    core/Upscaler   WebGL2: upload → [deband] → EASU, bicubic or bilinear → RCAS → canvas
+    core/Upscaler   WebGL2: upload → [deband] → EASU, bicubic or bilinear → RCAS → canvas,
+                    or upload → [deband] → Anime4K (HookPipeline) → bilinear → canvas
     core/FrameLoop  one callback per new video frame
 background          per-tab badge, keyboard shortcuts
 popup / options     switches, quality, sharpness, per-site rules
@@ -102,6 +108,15 @@ popup / options     switches, quality, sharpness, per-site rules
   direction; RCAS (Robust Contrast Adaptive Sharpening) restores sharpness without halos. Both
   are ported from the fp32 path of AMD's `ffx_fsr1.h` to GLSL ES 3.0. Intermediates stay 8-bit
   sRGB, as FSR1 is designed for, and the canvas is drawn at the display's physical resolution.
+- **Anime4K.** The original mpv shader files are run by a small interpreter of mpv's hook format
+  (`//!BIND`, `//!SAVE`, `//!WIDTH`, `//!WHEN`), so the passes, sizes and conditions are the
+  same as in mpv: a soft restore, then ×2, and above ×2.4 a second ×2 from half the output size. Its
+  feature maps are half-float textures (`EXT_color_buffer_float`; without it FSR1 is used), and
+  the result is scaled to the output with bilinear filtering. On real anime frames at 540p,
+  blurred and JPEG-compressed as web streams are, it gains 1.5 to 2.3 dB PSNR over FSR1 at
+  1080p. Clean sources are where it does worst (2 dB below FSR1 on one frame): the restore
+  pass also smooths fine texture. The soft restore of the "Mode B" preset was chosen over the
+  stronger one of "Mode A", which was worse on every frame tested.
 - **Frame timing.** `requestVideoFrameCallback` fires at only ~25 Hz in Firefox, even for 60 fps
   videos, so the extension checks `getVideoPlaybackQuality().totalVideoFrames` on every
   animation frame instead: one render per video frame.
@@ -116,8 +131,8 @@ popup / options     switches, quality, sharpness, per-site rules
 - **Performance.** Per-frame work happens only while upscaling; native videos are re-evaluated
   on events and once per second. After the first scan only added DOM nodes are examined, which
   matters on pages with live chat. If rendering falls behind the video **and** the measured GPU
-  cost per frame is high for 3 seconds, quality drops one step at a time: Bicubic + RCAS,
-  Bilinear + RCAS, then the native video. Off-screen videos release their WebGL context; at most
+  cost per frame is high for 3 seconds, quality drops one step at a time: FSR1 (from Anime4K),
+  Bicubic + RCAS, Bilinear + RCAS, then the native video. Off-screen videos release their WebGL context; at most
   12 contexts per frame are used.
 - **Settings** live in `storage.sync` with a versioned schema and queued writes, so rapid
   shortcuts never lose a change. **Logs** appear only in development builds.
@@ -142,7 +157,8 @@ sharpview-fsr-video-upscaler/
 │   ├── ui-test.mjs           # Popup and options, in every language
 │   └── lib.mjs               # Shared test helpers: static server, checks, page errors
 ├── src/
-│   ├── core/                 # WebGL2 renderer: FSR1 shaders, pipeline, geometry, frame loop
+│   ├── core/                 # WebGL2 renderer: FSR1 and Anime4K shaders, mpv hook interpreter,
+│   │                         # pipeline, geometry, frame loop
 │   ├── content/              # Content script: controller, session, layout, overlay, perf
 │   ├── background/           # Shortcuts, per-tab badge, permission onboarding
 │   ├── popup/                # Toolbar popup

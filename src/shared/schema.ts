@@ -48,6 +48,7 @@ export const DEFAULT_SETTINGS: Settings = {
 
 /** i18n keys of each quality: full label (popup) and short one (label on the video). */
 export const QUALITY_KEYS: Record<Quality, { label: string; short: string }> = {
+  anime: { label: 'qualityAnime', short: 'qualityAnimeShort' },
   high: { label: 'qualityHigh', short: 'qualityHighShort' },
   light: { label: 'qualityLight', short: 'qualityLightShort' },
   minimal: { label: 'qualityMinimal', short: 'qualityMinimalShort' },

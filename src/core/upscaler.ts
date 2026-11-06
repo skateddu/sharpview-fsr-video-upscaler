@@ -5,6 +5,10 @@ import easuSrc from './shaders/easu.frag.glsl';
 import bicubicSrc from './shaders/bicubic.frag.glsl';
 import rcasSrc from './shaders/rcas.frag.glsl';
 import debandSrc from './shaders/deband.frag.glsl';
+import anime4kOutSrc from './shaders/anime4k-out.frag.glsl';
+
+import { ANIME4K_MODE_B } from './anime4k';
+import { HookPipeline } from './hook-pipeline';
 
 import { DEFAULT_SHARPNESS, MODE_PASSES, type UpscaleMode, type UpscalePass } from './modes';
 
@@ -35,7 +39,7 @@ precision highp sampler2D;
 `;
 
 /** Uniforms set on every pass; the samplers (u_src, u_in) are bound once per program. */
-const UNIFORMS = ['u_outSize', 'u_flipY', 'u_split', 'u_inSize', 'u_sharpness', 'u_denoise', 'u_dither'] as const;
+const UNIFORMS = ['u_outSize', 'u_flipY', 'u_split', 'u_inSize', 'u_sharpness', 'u_denoise', 'u_dither', 'u_clamp'] as const;
 
 type UniformName = (typeof UNIFORMS)[number];
 
@@ -59,11 +63,13 @@ interface Target {
 const SRC_UNIT = 0;
 /** Input of the current pass: the source, the debanded source or the upscaled frame. */
 const IN_UNIT = 1;
+/** Highlight statistics of Anime4K (STATSMAX), for its last pass. */
+const STATS_UNIT = 2;
 
 /**
- * FSR1 upscaler on WebGL2, with lighter bicubic and bilinear pipelines. Draws `source` onto
- * the canvas given to the constructor, at the canvas's current resolution
- * (canvas.width × canvas.height).
+ * FSR1 upscaler on WebGL2, with Anime4K for animation and lighter bicubic and bilinear
+ * pipelines. Draws `source` onto the canvas given to the constructor, at the canvas's current
+ * resolution (canvas.width × canvas.height).
  */
 export class Upscaler {
   readonly gl: WebGL2RenderingContext;
@@ -78,7 +84,9 @@ export class Upscaler {
   private mid!: Target;
   /** Debanded source, at the source size. */
   private deb!: Target;
-  /** Half-float render targets are available (EXT_color_buffer_float). */
+  /** Anime4K, created the first time it is used. */
+  private anime: HookPipeline | null = null;
+  /** Half-float render targets are available (EXT_color_buffer_float): required by Anime4K. */
   private floatTargets = false;
   private srcW = 0;
   private srcH = 0;
@@ -132,7 +140,17 @@ export class Upscaler {
       this.ensure(this.deb, 0, 0, false);
     }
 
-    const { upscale, rcas } = MODE_PASSES[opts.mode];
+    let { upscale, rcas }: { upscale: UpscalePass; rcas: boolean } = MODE_PASSES[opts.mode];
+    if (upscale === 'anime4k') {
+      if (this.floatTargets) {
+        this.renderAnime4k(input, srcW, srcH, opts, split);
+        return;
+      }
+      // Its feature maps have negative values: without half-float targets, FSR1 instead.
+      ({ upscale, rcas } = MODE_PASSES.fsr);
+    }
+    // Another mode: give back Anime4K's textures (about 230 MB for a 1080p source).
+    this.anime?.release();
     // RCAS is skipped for the modes without it and at zero sharpening (it would change nothing).
     if (!rcas || opts.sharpness <= 0) {
       this.pass(upscale, input, null, opts, split, opts.deband);
@@ -141,6 +159,21 @@ export class Upscaler {
     this.ensure(this.mid, outW, outH, float);
     this.pass(upscale, input, this.mid, opts);
     this.pass('rcas', this.mid.tex, null, opts, split, opts.deband);
+  }
+
+  /** Anime4K on the source (or the debanded source), then scaled to the canvas. */
+  private renderAnime4k(input: WebGLTexture, srcW: number, srcH: number, opts: RenderOptions, split: number): void {
+    const gl = this.gl;
+    this.anime ??= new HookPipeline(gl, ANIME4K_MODE_B);
+    const { main, saved } = this.anime.run({ tex: input, w: srcW, h: srcH }, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    const stats = saved.get('STATSMAX');
+    gl.activeTexture(gl.TEXTURE0 + STATS_UNIT);
+    gl.bindTexture(gl.TEXTURE_2D, stats ? stats.tex : null);
+    const { program, loc } = this.programs.anime4k;
+    gl.useProgram(program);
+    gl.uniform1i(loc.u_clamp, stats ? 1 : 0);
+    // Half-float result: always dithered to the 8-bit output.
+    this.pass('anime4k', main.tex, null, opts, split, true);
   }
 
   /**
@@ -174,7 +207,10 @@ export class Upscaler {
       easu: this.link(easuSrc),
       rcas: this.link(rcasSrc),
       deband: this.link(debandSrc),
+      anime4k: this.link(anime4kOutSrc),
     };
+    // The old context's objects are gone: rebuilt the next time it is used.
+    this.anime = null;
     this.vao = gl.createVertexArray()!;
     this.srcTex = this.createTexture(gl.LINEAR);
     this.mid = this.createTarget(gl.NEAREST);
@@ -273,6 +309,7 @@ export class Upscaler {
     gl.useProgram(program);
     gl.uniform1i(gl.getUniformLocation(program, 'u_src'), SRC_UNIT);
     gl.uniform1i(gl.getUniformLocation(program, 'u_in'), IN_UNIT);
+    gl.uniform1i(gl.getUniformLocation(program, 'u_stats'), STATS_UNIT);
     return { program, loc };
   }
 

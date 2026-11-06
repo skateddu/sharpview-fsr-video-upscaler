@@ -6,7 +6,7 @@
 
   "cmdOpenPopup": { "message": "Abrir el panel" },
   "cmdToggle": { "message": "Activar/desactivar el escalado" },
-  "cmdToggleQuality": { "message": "Alternar FSR1 (EASU + RCAS) / Bicúbico + RCAS" },
+  "cmdToggleQuality": { "message": "Cambiar calidad: FSR1 / Bicúbico + RCAS / Anime4K" },
   "cmdToggleInfo": { "message": "Mostrar/ocultar resolución y fps en el vídeo" },
   "cmdToggleCompare": { "message": "Comparación A/B: bilineal a la izquierda, escalador a la derecha" },
   "cmdToggleDeband": { "message": "Activar/desactivar el deband: degradados más suaves en vídeos comprimidos" },
@@ -17,6 +17,8 @@
   "qualityLightShort": { "message": "bicúbico+RCAS" },
   "qualityMinimal": { "message": "Bilineal + RCAS" },
   "qualityMinimalShort": { "message": "bilineal+RCAS" },
+  "qualityAnime": { "message": "Anime4K (animación)" },
+  "qualityAnimeShort": { "message": "Anime4K" },
 
   "popupMasterSwitch": { "message": "Activar el escalado" },
   "popupNeedsAccess": { "message": "Se necesita acceso a los sitios para encontrar los vídeos." },

@@ -6,7 +6,7 @@
 
   "cmdOpenPopup": { "message": "Apri il popup" },
   "cmdToggle": { "message": "Attiva/disattiva l'upscaling" },
-  "cmdToggleQuality": { "message": "Alterna FSR1 (EASU + RCAS) / Bicubico + RCAS" },
+  "cmdToggleQuality": { "message": "Cambia qualità: FSR1 / Bicubico + RCAS / Anime4K" },
   "cmdToggleInfo": { "message": "Mostra/nascondi risoluzione e fps sul video" },
   "cmdToggleCompare": { "message": "Confronto A/B: bilineare a sinistra, upscaler a destra" },
   "cmdToggleDeband": { "message": "Attiva/disattiva il deband: sfumature più morbide sui video compressi" },
@@ -17,6 +17,8 @@
   "qualityLightShort": { "message": "bicubico+RCAS" },
   "qualityMinimal": { "message": "Bilineare + RCAS" },
   "qualityMinimalShort": { "message": "bilineare+RCAS" },
+  "qualityAnime": { "message": "Anime4K (animazione)" },
+  "qualityAnimeShort": { "message": "Anime4K" },
 
   "popupMasterSwitch": { "message": "Attiva l'upscaling" },
   "popupNeedsAccess": { "message": "Serve l'accesso ai siti per trovare i video." },

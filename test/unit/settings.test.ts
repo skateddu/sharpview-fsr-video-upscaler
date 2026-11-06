@@ -70,7 +70,8 @@ test('toRenderOptions: quality, sharpness and comparison', () => {
   assert.equal(toRenderOptions({ ...DEFAULT_SETTINGS, deband: true }, 'minimal').deband, true);
 });
 
-test('lowerQuality: high → light → minimal → native', () => {
+test('lowerQuality: anime → high → light → minimal → native', () => {
+  assert.equal(lowerQuality('anime'), 'high');
   assert.equal(lowerQuality('high'), 'light');
   assert.equal(lowerQuality('light'), 'minimal');
   assert.equal(lowerQuality('minimal'), null);

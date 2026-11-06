@@ -7,6 +7,17 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- **Anime4K quality** for animation: the "Mode B (Fast)" preset of
+  [Anime4K](https://github.com/bloc97/Anime4K) v4 (MIT), chosen from the quality menu or with
+  the quality shortcut, which now cycles through three qualities. It gently removes
+  compression artifacts and blur, then doubles the resolution, and above ×2.4 doubles it again with a
+  lighter network. The original mpv shader files run unchanged on a small interpreter of mpv's
+  hook format. About 1.5 ms per 1080p → 1440p frame on an RTX 5070 Ti Laptop (FSR1: 0.2 ms);
+  on a slow GPU it falls back to FSR1 first. Needs half-float render targets, otherwise FSR1 is
+  used. Sharpness does not apply to it; deband does
+
 ## [1.3.0] - 2026-11-05
 
 ### Added

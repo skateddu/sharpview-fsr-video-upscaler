@@ -10,6 +10,7 @@ const MODE_LABELS: Record<UpscaleMode, string> = {
   bicubic: 'Bicubic',
   'bilinear-rcas': 'Bilinear + RCAS',
   bilinear: 'Bilinear',
+  anime4k: 'Anime4K (Mode B, fast)',
 };
 
 const video = $<HTMLVideoElement>('video');
