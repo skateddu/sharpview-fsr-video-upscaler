@@ -7,6 +7,16 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [1.4.1] - 2026-11-14
+
+### Fixed
+
+- **No more freeze when Anime4K starts**: its 25 shader programs took about 200 ms to compile
+  in a single frame. They now compile one per frame, with FSR1 shown meanwhile (under a
+  second); Firefox has no parallel shader compilation
+- **Info label and popup on GPUs without half-float render targets** said "Anime4K" while FSR1
+  was drawn in its place; they now show FSR1
+
 ## [1.4.0] - 2026-11-06
 
 ### Added
@@ -124,7 +134,8 @@ First release.
 - **Tests**: unit (node --test), rendering regression against reference images, end-to-end on a
   fixture with 13 layouts, popup and options in English and Italian; CI on GitHub Actions
 
-[Unreleased]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.4.1...HEAD
+[1.4.1]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/skateddu/sharpview-fsr-video-upscaler/compare/v1.1.0...v1.2.0
