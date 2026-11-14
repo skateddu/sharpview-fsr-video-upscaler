@@ -27,11 +27,15 @@ const browser = await firefox.launch();
 const page = await browser.newPage({ viewport: { width: 1800, height: 1000 } });
 const errors = trackErrors(page, base);
 
-/** Draws synchronously and reads the WebGL canvas before it is presented. */
-const snapshot = () => page.evaluate(() => {
+/**
+ * Draws synchronously and reads the WebGL canvas before it is presented. With `warm`, Anime4K's
+ * programs are compiled first: otherwise its first frames are FSR1.
+ */
+const snapshot = (warm = false) => page.evaluate((warm) => {
+  if (warm) window.__playground.upscaler().warmUp();
   window.__playground.draw();
   return window.__playground.canvas.toDataURL('image/png');
-});
+}, warm);
 
 const dataUrlToBuffer = (url) => Buffer.from(url.split(',')[1], 'base64');
 const fileToDataUrl = async (path) => `data:image/png;base64,${(await readFile(path)).toString('base64')}`;
@@ -95,8 +99,13 @@ for (const [name, query] of cases) {
     expect(name, false, await page.locator('#status').textContent());
     continue;
   }
-  await check(name, await snapshot());
+  await check(name, await snapshot(name === 'anime4k'));
 }
+
+// Anime4K compiles a few programs per frame instead of freezing the page: meanwhile, FSR1.
+await page.goto(`${base}?pattern&mode=anime4k&out=x3`);
+await page.waitForFunction(() => document.body.dataset.status !== undefined, null, { timeout: 10000 });
+await check('anime4k-compiling', await snapshot(), 'fsr');
 
 // Context loss and restore: rendering must resume identically.
 await page.goto(`${base}?pattern&mode=fsr&out=x3`);

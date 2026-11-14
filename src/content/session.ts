@@ -173,7 +173,9 @@ export class VideoSession {
   }
 
   private effectiveQuality(): Quality {
-    return this.reduced ?? this.settings.quality;
+    const quality = this.reduced ?? this.settings.quality;
+    // Without half-float targets the renderer draws FSR1 instead of Anime4K: say so.
+    return quality === 'anime' && this.upscaler && !this.upscaler.supportsAnime4k ? 'high' : quality;
   }
 
   private renderOptions(quality: Quality): RenderOptions {

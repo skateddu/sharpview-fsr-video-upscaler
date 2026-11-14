@@ -142,11 +142,13 @@ export class Upscaler {
 
     let { upscale, rcas }: { upscale: UpscalePass; rcas: boolean } = MODE_PASSES[opts.mode];
     if (upscale === 'anime4k') {
-      if (this.floatTargets) {
-        this.renderAnime4k(input, srcW, srcH, opts, split);
+      // FSR1 meanwhile: while the programs compile, a few per frame, and for good without
+      // half-float targets (Anime4K's feature maps have negative values).
+      const anime = this.floatTargets ? this.anime4k() : null;
+      if (anime) {
+        this.renderAnime4k(anime, input, srcW, srcH, opts, split);
         return;
       }
-      // Its feature maps have negative values: without half-float targets, FSR1 instead.
       ({ upscale, rcas } = MODE_PASSES.fsr);
     }
     // Another mode: give back Anime4K's textures (about 230 MB for a 1080p source).
@@ -161,11 +163,34 @@ export class Upscaler {
     this.pass('rcas', this.mid.tex, null, opts, split, opts.deband);
   }
 
+  /** False while Anime4K cannot be used: FSR1 is drawn in its place. */
+  get supportsAnime4k(): boolean {
+    return this.floatTargets;
+  }
+
+  /** Compiles all of Anime4K's programs now (tests and benchmarks), instead of over a few frames. */
+  warmUp(): void {
+    if (this.floatTargets) this.anime4k(true);
+  }
+
+  /** Anime4K's pipeline once its programs are compiled: one more per call, or all of them. */
+  private anime4k(all = false): HookPipeline | null {
+    const anime = (this.anime ??= new HookPipeline(this.gl, ANIME4K_MODE_B));
+    while (!anime.compileNext()) if (!all) return null;
+    return anime;
+  }
+
   /** Anime4K on the source (or the debanded source), then scaled to the canvas. */
-  private renderAnime4k(input: WebGLTexture, srcW: number, srcH: number, opts: RenderOptions, split: number): void {
+  private renderAnime4k(
+    anime: HookPipeline,
+    input: WebGLTexture,
+    srcW: number,
+    srcH: number,
+    opts: RenderOptions,
+    split: number,
+  ): void {
     const gl = this.gl;
-    this.anime ??= new HookPipeline(gl, ANIME4K_MODE_B);
-    const { main, saved } = this.anime.run({ tex: input, w: srcW, h: srcH }, gl.drawingBufferWidth, gl.drawingBufferHeight);
+    const { main, saved } = anime.run({ tex: input, w: srcW, h: srcH }, gl.drawingBufferWidth, gl.drawingBufferHeight);
     const stats = saved.get('STATSMAX');
     gl.activeTexture(gl.TEXTURE0 + STATS_UNIT);
     gl.bindTexture(gl.TEXTURE_2D, stats ? stats.tex : null);
@@ -181,6 +206,7 @@ export class Upscaler {
    * readPixels forces synchronization with the GPU.
    */
   benchmark(source: TexImageSource, srcW: number, srcH: number, opts: RenderOptions, frames = 120): number {
+    if (opts.mode === 'anime4k') this.warmUp();
     this.render(source, srcW, srcH, opts);
     this.finish();
     const t0 = performance.now();

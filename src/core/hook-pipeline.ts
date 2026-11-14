@@ -45,11 +45,13 @@ const FIRST_UNIT = 1;
  * MAIN. OUTPUT is the final size and NATIVE the input's, for the WHEN conditions and the sizes.
  * Intermediate textures are half float (EXT_color_buffer_float is required). PREKERNEL passes
  * are not run: the caller applies them while scaling to the output.
- * Programs are compiled the first time they are needed.
+ * Programs are compiled one at a time with compileNext(), or all at once by run().
  */
 export class HookPipeline {
   readonly passes: Pass[];
   private readonly pool = new Map<string, Target>();
+  /** Passes whose program is not compiled yet, for compileNext(). */
+  private pending: Pass[];
   private readonly vert: WebGLShader;
 
   constructor(
@@ -64,6 +66,7 @@ export class HookPipeline {
       }),
     );
     this.vert = this.compile(gl.VERTEX_SHADER, VERT);
+    this.pending = this.passes.filter((p) => p.hook === 'MAIN');
   }
 
   /**
@@ -114,9 +117,15 @@ export class HookPipeline {
     this.pool.clear();
   }
 
-  /** Compiles every program now, instead of at the first frame that needs it. */
-  compileAll(): void {
-    for (const p of this.passes) if (p.hook === 'MAIN') this.program(p);
+  /**
+   * Compiles the next program not compiled yet; true once they all are. Firefox has no
+   * KHR_parallel_shader_compile: compiling them all in one frame would freeze the page (Anime4K
+   * has 25 programs of 3-14 ms each), one per frame does not.
+   */
+  compileNext(): boolean {
+    const p = this.pending.shift();
+    if (p) this.program(p);
+    return this.pending.length === 0;
   }
 
   private draw(p: Pass, inputs: Image[], target: Target): void {
